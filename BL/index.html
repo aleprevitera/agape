@@ -277,6 +277,81 @@
             font-size: 0.8rem;
         }
         
+        /* Stili per la schermata di login */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .login-container {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 20px;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .login-button {
+            background-color: var(--secondary);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        .login-button:hover {
+            background-color: #219653;
+        }
+        
+        .error-message {
+            color: var(--accent);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        /* Stili per il pulsante di logout */
+        .logout-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: var(--card-shadow);
+        }
+        
         @media (max-width: 768px) {
             .patient-info {
                 flex-direction: column;
@@ -296,7 +371,26 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Schermata di login -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h2>Area Riservata</h2>
+                <p>Inserisci la password per accedere alla cartella clinica</p>
+            </div>
+            <div class="login-form">
+                <div class="error-message" id="errorMessage">Password non corretta. Riprova.</div>
+                <input type="password" id="passwordInput" placeholder="Password">
+                <button class="login-button" id="loginButton">Accedi</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pulsante di logout -->
+    <button class="logout-button" id="logoutButton" style="display: none;">Logout</button>
+    
+    <!-- Contenuto della cartella clinica -->
+    <div class="container" id="contentContainer" style="display: none;">
         <header>
             <div style ="display: none" class="patient-tag">ID: 62873/LB</div>
             <div style ="display: none" class="hospital-logo">AGAPè</div>
@@ -703,5 +797,75 @@
             Documento generato il 15/04/2025 | AGP
         </footer>
     </div>
+    
+    <script>
+        // Password per accedere alla cartella clinica
+        const correctPassword = "jackie";
+        
+        // Elementi del DOM
+        const loginOverlay = document.getElementById("loginOverlay");
+        const contentContainer = document.getElementById("contentContainer");
+        const passwordInput = document.getElementById("passwordInput");
+        const loginButton = document.getElementById("loginButton");
+        const errorMessage = document.getElementById("errorMessage");
+        const logoutButton = document.getElementById("logoutButton");
+        
+        // Funzione per verificare la password
+        function checkPassword() {
+            const enteredPassword = passwordInput.value;
+            
+            if (enteredPassword === correctPassword) {
+                // Password corretta, mostra il contenuto
+                loginOverlay.style.display = "none";
+                contentContainer.style.display = "block";
+                logoutButton.style.display = "block";
+                
+                // Salva lo stato di login nel localStorage
+                localStorage.setItem("medicalRecordAuthenticated", "true");
+            } else {
+                // Password errata, mostra il messaggio di errore
+                errorMessage.style.display = "block";
+                passwordInput.value = "";
+                passwordInput.focus();
+            }
+        }
+        
+        // Funzione per effettuare il logout
+        function logout() {
+            // Nascondi il contenuto e mostra la schermata di login
+            loginOverlay.style.display = "flex";
+            contentContainer.style.display = "none";
+            logoutButton.style.display = "none";
+            passwordInput.value = "";
+            errorMessage.style.display = "none";
+            
+            // Rimuovi lo stato di login dal localStorage
+            localStorage.removeItem("medicalRecordAuthenticated");
+        }
+        
+        // Event listener per il pulsante di login
+        loginButton.addEventListener("click", checkPassword);
+        
+        // Event listener per premere Enter nel campo password
+        passwordInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        });
+        
+        // Event listener per il pulsante di logout
+        logoutButton.addEventListener("click", logout);
+        
+        // Controlla se l'utente era già autenticato
+        window.addEventListener("DOMContentLoaded", function() {
+            const isAuthenticated = localStorage.getItem("medicalRecordAuthenticated");
+            
+            if (isAuthenticated === "true") {
+                loginOverlay.style.display = "none";
+                contentContainer.style.display = "block";
+                logoutButton.style.display = "block";
+            }
+        });
+    </script>
 </body>
 </html>
