@@ -615,24 +615,7 @@ Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostaco
     </footer>
     
     <script>
-        // Animazione scroll reveal
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
-                }
-            });
-        }, observerOptions);
-        
-        // Osserva tutti gli elementi delle card
-        document.querySelectorAll('.creazione-card, .ispirazione-block').forEach(el => {
-            observer.observe(el);
-        });
+
         
         // Form submission
         document.querySelector('.contact-form').addEventListener('submit', (e) => {
