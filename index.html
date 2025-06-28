@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Arte del Tempo Sospeso</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-crema: #F5F2EA;
+            --color-sabbia: #E8DCC4;
+            --color-oro: #C19A6B;
+            --color-ametista: #9B7AA8;
+            --color-verde-salvia: #87A96B;
+            --color-testo: #3A3A3A;
+            --color-testo-light: #6B6B6B;
+        }
+        
+        body {
+            font-family: 'Lato', sans-serif;
+            color: var(--color-testo);
+            background-color: var(--color-crema);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Texture di sfondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.03) 35px, rgba(255,255,255,.03) 70px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            color: var(--color-testo);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, var(--color-crema) 0%, var(--color-sabbia) 100%);
+            position: relative;
+        }
+        
+        .hero-content {
+            animation: fadeInUp 1.2s ease-out;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--color-testo-light);
+            font-weight: 300;
+            font-style: italic;
+        }
+        
+        .hero-image {
+            width: 300px;
+            height: 300px;
+            margin: 3rem auto;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Sezione Creazioni */
+        .creazioni {
+            padding: 80px 0;
+            background-color: #fff;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 3rem;
+            color: var(--color-oro);
+        }
+        
+        .creazioni-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .creazione-card {
+            background: var(--color-crema);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .creazione-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .creazione-image {
+            height: 500px;
+            background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .creazione-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        
+        .creazione-content {
+            padding: 2rem;
+        }
+        
+        .creazione-name {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-oro);
+        }
+        
+        .creazione-desc {
+            font-style: italic;
+            color: var(--color-testo-light);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .creazione-materials {
+            font-size: 0.9rem;
+            color: var(--color-verde-salvia);
+            border-top: 1px solid var(--color-sabbia);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        /* Sezione Ispirazione */
+        .ispirazione {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--color-crema) 0%, #fff 50%, var(--color-crema) 100%);
+        }
+        
+        .ispirazione-intro {
+            max-width: 800px;
+            margin: 0 auto 4rem;
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 2;
+            color: var(--color-testo-light);
+            font-style: italic;
+        }
+        
+        .ispirazione-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .ispirazione-block {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        
+        .ispirazione-block:hover {
+            transform: translateY(-3px);
+        }
+        
+        .ispirazione-block h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            color: var(--color-ametista);
+        }
+        
+        .ispirazione-block p {
+            color: var(--color-testo-light);
+            line-height: 1.8;
+            text-align: justify;
+            font-size: 1rem;
+        }
+        
+        /* Sezione Contatti */
+        .contatti {
+            padding: 80px 0;
+            background-color: #fff;
+        }
+        
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--color-crema);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-testo);
+            font-weight: 400;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--color-sabbia);
+            border-radius: 6px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-oro);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .submit-btn {
+            background: var(--color-oro);
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 2rem auto 0;
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 1px;
+        }
+        
+        .submit-btn:hover {
+            background: var(--color-ametista);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--color-testo);
+            color: var(--color-crema);
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .footer-quote {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .social-links a {
+            color: var(--color-crema);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--color-oro);
+        }
+        
+        /* Animazioni */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem 0;
+            }
+            
+            .hero-image {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .creazioni-grid,
+            .ispirazione-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .contact-form {
+                padding: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>L'Arte del Tempo Sospeso</h1>
+                <p>Ogni albero nasce da un dialogo silenzioso con la natura. Osserviamo i biomi del mondo e ne catturiamo l'essenza in miniature preziose. Non sono semplici decorazioni: sono portali verso mondi interiori, meditazioni tangibili sulla bellezza effimera e l'eternità racchiusa in un istante.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Sezione Creazioni -->
+    <section class="creazioni">
+        <div class="container">
+            <h2 class="section-title">Le Nostre Creazioni</h2>
+            <div class="creazioni-grid">
+                <!-- Rosso di Kyoto -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/Fzv07YCy/1000045522.jpg" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Rosso di Kyoto</h3>
+                        <p class="creazione-desc">
+                        Ispirato ai giardini zen di Kyoto durante il Momijigari, Rosso di Kyoto celebra l’autunno nella sua forma più pura e poetica. Le gemme in agata corniola evocano le chiome infuocate degli aceri giapponesi, mentre la base in ametista richiama le brume mattutine che accarezzano le pietre nei templi.
+                    </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Agata corniola, Ametista<br>
+                        </p>
+                    </div>
+                </div>
+                
+                 <!-- Tundra  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/VsMwjDDs/1000045648.jpg" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Tundra</h3>
+                        <p class="creazione-desc">
+                        Un albero di silenzio e luce. Tundra nasce dove la terra incontra il ghiaccio, e ogni gemma bianca racconta la poesia dell’essenziale. La base in ametista illumina la scena come un crepuscolo nordico, sospeso tra pace e mistero.                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Quarzo bianco, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Selva -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/g0bWnRbt/1000045642.jpg" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Selva</h3>
+                        <p class="creazione-desc">
+                            Un inno alla vita selvaggia e incontaminata. Selva è un albero che pulsa di vitalità, con foglie di agata verde che evocano le fronde fitte di una foresta lussureggiante. La base in ametista, come una radura velata dalla rugiada, aggiunge mistero e profondità.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Agata verde, Ametista<br>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Laguna  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/s213Fyys/1000045646.jpg" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Laguna</h3>
+                        <p class="creazione-desc">
+                            Un albero nato dall’acqua e dalla quiete. Le sue gemme blu e verdi galleggiano tra i rami come riflessi in una laguna profonda, mentre la base in ametista richiama le pietre lisce del fondale illuminate dalla luna. Laguna è introspezione, respiro lento, equilibrio silenzioso.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dolce inverno  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/RFz0fF2G/1000045644.jpg" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Dolce Inverno</h3>
+                        <p class="creazione-desc">
+                        Una bacca che resiste al gelo, una scintilla di vita nella stagione più silenziosa. Dolce Inverno è un albero che parla di calore interiore, resilienza e bellezza discreta. Le sue gemme scarlatte si stagliano sui rami dorati come frutti di un tempo sospeso, radicati nella base di ametista che conserva il silenzio delle notti fredde.                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+                <!-- Sakura  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/qRt4WNgX/839c477a-40de-4ec1-be1b-18ba8e0a8e0b.png" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Sakura</h3>
+                        <p class="creazione-desc">
+                            Ispirato alla fioritura dei ciliegi in Giappone, Sakura è un inno alla bellezza del momento presente. Le sue gemme chiarissime sembrano petali sospesi nella luce, mentre la base in ametista raccoglie l’eco silenziosa di un giardino zen. È un albero di grazia, leggerezza e rinascita.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+                <!-- Etere  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/CxQDYZSr/bff74c6a-ac8f-45d4-ba17-89e9ae7584cd.png" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Etere</h3>
+                        <p class="creazione-desc">
+                            Un albero fuori dal tempo.
+Non ha stagioni, non ha fronde: solo frammenti di luce ordinata, come se il vento avesse deciso di fermarsi e posarsi sui rami. Etere non affonda le radici, galleggia. È il più rarefatto della collezione. Eppure è presente, concreto, semplice. Come il silenzio quando è completo.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Labradorite, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+                <!-- Radice Antica  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/x8g4sGM1/37dbf8f6-62a6-465b-bc69-55d03aa72703.png" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Radice Antica</h3>
+                        <p class="creazione-desc">
+                        Nessun fronzolo. Solo radici e pietra.
+                        Radice Antica non vuole essere bello, vuole essere vero. Le sue gemme scure non brillano: assorbono la luce. I rami si aprono bassi, larghi, come se cercassero di proteggere la terra da cui nascono. E quella base ruvida, chiara, non è una roccia: è una memoria.
+                        Un albero che sembra trovato, non costruito.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Granato, Pietra calcarea<br>
+                        </p>
+                    </div>
+                </div>
+                <!-- Mistral  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/kXqcGt8T/d06df5a5-0de6-4135-b01a-1f32e997bd92.png" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Mistral</h3>
+                        <p class="creazione-desc">
+                        C'è un vento che passa tra i rami e fa vibrare ogni gemma come se volesse suonarle. Mistral non è un albero fermo: è in viaggio. Viene dal sud, porta con sé il sole, la sabbia, i tramonti. Tocca la terra, ma sogna l’aria. Le sue foglie sono leggere, le radici scaldate da una roccia dorata.
+Un albero nato per chi sorride guardando il cielo.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
+                        </p>
+                    </div>
+                </div>
+                <!-- Campoverde  -->
+                <div class="creazione-card">
+                    <div class="creazione-image">
+                        <img src="https://i.postimg.cc/vHKppsc7/43b0c4d3-d95e-4b10-ad4d-0beac733e3bf.png" alt="">
+                    </div>
+                    <div class="creazione-content">
+                        <h3 class="creazione-name">Campoverde</h3>
+                        <p class="creazione-desc">
+                        Non c’è ombra in Campoverde.
+Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostacoli. Le sue foglie sembrano appena spuntate, ancora giovani, quasi timide. Il tronco poggia su una radice scavata, chiara, levigata dal tempo. È un albero di primavera piena, di confine tra natura e gesto umano, tra campo coltivato e prato selvatico.
+                        </p>
+                        <p class="creazione-materials">
+                            <strong>Materiali:</strong> Olivina, Marmo<br>
+                        </p>
+                    </div>
+                </div>
+
+               
+            </div>
+        </div>
+    </section>
+    
+    <!-- Sezione Ispirazione -->
+    <section class="ispirazione">
+        <div class="container">
+            <div class="ispirazione-grid">
+                <div class="ispirazione-block">
+                    <h3>Il Linguaggio delle Stagioni</h3>
+                    <p>Come gli antichi maestri giapponesi che celebravano il Momijigari – la contemplazione delle foglie d'autunno – ogni nostra creazione cattura un momento preciso del ciclo naturale. L'agata corniola sussurra di foglie che cadono, il quarzo verde canta la promessa della primavera, mentre l'ametista conserva il silenzio cristallino dell'inverno. Attraverso il filo dorato che si intreccia come il tempo stesso, ogni albero diventa un haiku tridimensionale.</p>
+                </div>
+                <div class="ispirazione-block">
+                    <h3>Geologia dell'Anima</h3>
+                    <p>Le pietre che scegliamo non sono casuali. Sono frammenti di storia planetaria, cristallizzazioni di forze primordiali. L'ametista, nata nel cuore della terra, porta con sé la saggezza del silenzio. L'agata racconta storie di trasformazione lenta e paziente. Il quarzo rosa vibra di compassione universale. Quando intrecciamo il filo metallico attorno a queste gemme, non stiamo solo creando arte: stiamo tessendo un dialogo tra la mano umana e la memoria minerale del mondo.</p>
+                </div>
+                <div class="ispirazione-block">
+                    <h3>Biomi dell'Immaginario</h3>
+                    <p>Dalla tundra silenziosa dove il vento scolpisce paesaggi essenziali, alla selva vibrante dove ogni foglia pulsa di vita segreta. Dai giardini zen dove ogni pietra è posizionata secondo una geometria sacra, alle lagune dove l'acqua conserva i riflessi della luna. I nostri alberi sono cartografie emotive di questi luoghi-archetipi. Chi li contempla non vede solo un oggetto decorativo, ma intraprende un viaggio verso paesaggi interiori inesplorati.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Sezione Contatti -->
+    <section class="contatti">
+        <div class="container">
+            <h2 class="section-title">Contattaci</h2>
+            <form class="contact-form" action="#" method="POST">
+                <div class="form-group">
+                    <label for="name">Il tuo nome</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">La tua email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Il tuo messaggio</label>
+                    <textarea id="message" name="message" required placeholder="Raccontaci della tua visione..."></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Invia Messaggio</button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p class="footer-quote">"Ogni albero ha una storia da raccontare"</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Pinterest</a>
+                <a href="#">Etsy</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Animazione scroll reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+        
+        // Osserva tutti gli elementi delle card
+        document.querySelectorAll('.creazione-card, .ispirazione-block').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Form submission
+        document.querySelector('.contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Grazie per il tuo messaggio! Ti risponderemo presto.');
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
