@@ -1,0 +1,19 @@
+{"Creazione Card": {
+  "prefix": "sec",
+  "body": [
+	"<!-- NOME  -->",
+    "<div class=\"creazione-card\">",
+    "    <div class=\"creazione-image\">",
+    "        <img src=\"${1:IMMAGINE}\" alt=\"\">",
+    "    </div>",
+    "    <div class=\"creazione-content\">",
+    "        <h3 class=\"creazione-name\">${2:NOME}</h3>",
+    "        <p class=\"creazione-desc\">${3:DESCRIZIONE}</p>",
+    "        <p class=\"creazione-materials\">",
+    "            <strong>Materiali:</strong> ${4:MATERIALI}<br>",
+    "        </p>",
+    "    </div>",
+    "</div>"
+  ],
+  "description": "Inserisce una card creazione con immagine, nome, descrizione e materiali"
+}}
