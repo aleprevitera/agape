@@ -230,6 +230,132 @@
             font-size: 1rem;
         }
         
+        /* Sezione Artigiano */
+        .artigiano {
+            padding: 80px 0;
+            background-color: #fff;
+            position: relative;
+        }
+        
+        .artigiano::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(139, 169, 107, 0.03) 0%, rgba(155, 122, 168, 0.05) 100%);
+            pointer-events: none;
+        }
+        
+        .artigiano-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .artigiano-image {
+            position: relative;
+        }
+        
+        .artigiano-photo {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 4/5;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            margin: 0 auto;
+            background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
+        }
+        
+        .artigiano-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .artigiano-photo:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Cornice decorativa intorno alla foto */
+        .artigiano-photo::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--color-oro);
+            border-radius: 16px;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .artigiano-text {
+            padding: 2rem 0;
+        }
+        
+        .artigiano-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--color-oro);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .artigiano-subtitle {
+            font-size: 1.2rem;
+            color: var(--color-ametista);
+            font-style: italic;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        .artigiano-bio {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--color-testo-light);
+            text-align: justify;
+        }
+        
+        .artigiano-bio p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .artigiano-bio p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .artigiano-quote {
+            background: var(--color-crema);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid var(--color-oro);
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--color-testo);
+            position: relative;
+        }
+        
+        .artigiano-quote::before {
+            content: '"';
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--color-oro);
+            position: absolute;
+            top: -10px;
+            left: 1rem;
+            opacity: 0.3;
+        }
+        
         /* Sezione Contatti */
         .contatti {
             padding: 80px 0;
@@ -371,6 +497,20 @@
                 gap: 2rem;
             }
             
+            .artigiano-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .artigiano-photo {
+                max-width: 300px;
+            }
+            
+            .artigiano-name {
+                font-size: 2rem;
+            }
+            
             .contact-form {
                 padding: 2rem;
             }
@@ -405,7 +545,7 @@
                     <div class="creazione-content">
                         <h3 class="creazione-name">Rosso di Kyoto</h3>
                         <p class="creazione-desc">
-                        Ispirato ai giardini zen di Kyoto durante il Momijigari, Rosso di Kyoto celebra l’autunno nella sua forma più pura e poetica. Le gemme in agata corniola evocano le chiome infuocate degli aceri giapponesi, mentre la base in ametista richiama le brume mattutine che accarezzano le pietre nei templi.
+                        Ispirato ai giardini zen di Kyoto durante il Momijigari, Rosso di Kyoto celebra l'autunno nella sua forma più pura e poetica. Le gemme in agata corniola evocano le chiome infuocate degli aceri giapponesi, mentre la base in ametista richiama le brume mattutine che accarezzano le pietre nei templi.
                     </p>
                         <p class="creazione-materials">
                             <strong>Materiali:</strong> Agata corniola, Ametista<br>
@@ -421,7 +561,7 @@
                     <div class="creazione-content">
                         <h3 class="creazione-name">Tundra</h3>
                         <p class="creazione-desc">
-                        Un albero di silenzio e luce. Tundra nasce dove la terra incontra il ghiaccio, e ogni gemma bianca racconta la poesia dell’essenziale. La base in ametista illumina la scena come un crepuscolo nordico, sospeso tra pace e mistero.                        </p>
+                        Un albero di silenzio e luce. Tundra nasce dove la terra incontra il ghiaccio, e ogni gemma bianca racconta la poesia dell'essenziale. La base in ametista illumina la scena come un crepuscolo nordico, sospeso tra pace e mistero.                        </p>
                         <p class="creazione-materials">
                             <strong>Materiali:</strong> Quarzo bianco, Ametista lavanda<br>
                         </p>
@@ -452,7 +592,7 @@
                     <div class="creazione-content">
                         <h3 class="creazione-name">Laguna</h3>
                         <p class="creazione-desc">
-                            Un albero nato dall’acqua e dalla quiete. Le sue gemme blu e verdi galleggiano tra i rami come riflessi in una laguna profonda, mentre la base in ametista richiama le pietre lisce del fondale illuminate dalla luna. Laguna è introspezione, respiro lento, equilibrio silenzioso.
+                            Un albero nato dall'acqua e dalla quiete. Le sue gemme blu e verdi galleggiano tra i rami come riflessi in una laguna profonda, mentre la base in ametista richiama le pietre lisce del fondale illuminate dalla luna. Laguna è introspezione, respiro lento, equilibrio silenzioso.
                         </p>
                         <p class="creazione-materials">
                             <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
@@ -482,7 +622,7 @@
                     <div class="creazione-content">
                         <h3 class="creazione-name">Sakura</h3>
                         <p class="creazione-desc">
-                            Ispirato alla fioritura dei ciliegi in Giappone, Sakura è un inno alla bellezza del momento presente. Le sue gemme chiarissime sembrano petali sospesi nella luce, mentre la base in ametista raccoglie l’eco silenziosa di un giardino zen. È un albero di grazia, leggerezza e rinascita.
+                            Ispirato alla fioritura dei ciliegi in Giappone, Sakura è un inno alla bellezza del momento presente. Le sue gemme chiarissime sembrano petali sospesi nella luce, mentre la base in ametista raccoglie l'eco silenziosa di un giardino zen. È un albero di grazia, leggerezza e rinascita.
                         </p>
                         <p class="creazione-materials">
                             <strong>Materiali:</strong> Quarzo rosa, Ametista lavanda<br>
@@ -530,7 +670,7 @@ Non ha stagioni, non ha fronde: solo frammenti di luce ordinata, come se il vent
                     <div class="creazione-content">
                         <h3 class="creazione-name">Mistral</h3>
                         <p class="creazione-desc">
-                        C'è un vento che passa tra i rami e fa vibrare ogni gemma come se volesse suonarle. Mistral non è un albero fermo: è in viaggio. Viene dal sud, porta con sé il sole, la sabbia, i tramonti. Tocca la terra, ma sogna l’aria. Le sue foglie sono leggere, le radici scaldate da una roccia dorata.
+                        C'è un vento che passa tra i rami e fa vibrare ogni gemma come se volesse suonarle. Mistral non è un albero fermo: è in viaggio. Viene dal sud, porta con sé il sole, la sabbia, i tramonti. Tocca la terra, ma sogna l'aria. Le sue foglie sono leggere, le radici scaldate da una roccia dorata.
 Un albero nato per chi sorride guardando il cielo.
                         </p>
                         <p class="creazione-materials">
@@ -546,7 +686,7 @@ Un albero nato per chi sorride guardando il cielo.
                     <div class="creazione-content">
                         <h3 class="creazione-name">Campoverde</h3>
                         <p class="creazione-desc">
-                        Non c’è ombra in Campoverde.
+                        Non c'è ombra in Campoverde.
 Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostacoli. Le sue foglie sembrano appena spuntate, ancora giovani, quasi timide. Il tronco poggia su una radice scavata, chiara, levigata dal tempo. È un albero di primavera piena, di confine tra natura e gesto umano, tra campo coltivato e prato selvatico.
                         </p>
                         <p class="creazione-materials">
@@ -561,7 +701,7 @@ Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostaco
                     </div>
                     <div class="creazione-content">
                         <h3 class="creazione-name">Notturno</h3>
-                        <p class="creazione-desc">Ha la struttura di un pensiero calmo. Notturno non è fatto per essere guardato di fretta. Le sue foglie sembrano note sospese: blu profonde, come l’inizio della notte; lavanda, come la memoria della luce.
+                        <p class="creazione-desc">Ha la struttura di un pensiero calmo. Notturno non è fatto per essere guardato di fretta. Le sue foglie sembrano note sospese: blu profonde, come l'inizio della notte; lavanda, come la memoria della luce.
 Ogni ramo segue un ritmo, ogni gemma un respiro. La sua base è una partitura di ametista, su cui la composizione si appoggia in silenzio.
 Un albero che non parla. Suona.</p>
                         <p class="creazione-materials">
@@ -599,17 +739,17 @@ Cosa protegge? Nessuno lo sa. Ma si capisce subito che non è un albero qualsias
                         </p>
                     </div>
                 </div>
-                <!-- Bacca d’Oro  -->
+                <!-- Bacca d'Oro  -->
                 <div class="creazione-card">
                     <div class="creazione-image">
                         <img src="https://i.postimg.cc/WpDJgqXN/Chat-GPT-Image-13-lug-2025-10-32-39.png" alt="">
                     </div>
                     <div class="creazione-content">
-                        <h3 class="creazione-name">Bacca d’Oro</h3>
+                        <h3 class="creazione-name">Bacca d'Oro</h3>
                         <p class="creazione-desc">Non ha bisogno di presentazioni.
-Bacca d’Oro è un albero che si prende il centro. Le sue gemme rosse sembrano mirtilli maturi, ciliegie lucide, piccoli frutti pronti a essere colti. Ma non lo sono.
+Bacca d'Oro è un albero che si prende il centro. Le sue gemme rosse sembrano mirtilli maturi, ciliegie lucide, piccoli frutti pronti a essere colti. Ma non lo sono.
 Stanno lì per farsi guardare.
-Sotto, una pietra chiara con venature dorate che sembra dire: “questo è il mio terreno”. Nessuna poesia, solo presenza.</p>
+Sotto, una pietra chiara con venature dorate che sembra dire: "questo è il mio terreno". Nessuna poesia, solo presenza.</p>
                         <p class="creazione-materials">
                             <strong>Materiali:</strong>Agata rossa lucida, Quarzo grezzo con inclusioni giallo ocra<br>
                         </p>
@@ -635,6 +775,43 @@ Chi lo guarda sente silenzio. Ma anche attesa.</p>
             </div>
         </div>
     </section>
+
+    
+    <!-- Sezione Artigiano -->
+    <section class="artigiano">
+        <div class="container">
+            <h2 class="section-title">L'Artigiano</h2>
+            <div class="artigiano-content">
+                <div class="artigiano-image">
+                    <div class="artigiano-photo">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=face" alt="Maestro artigiano al lavoro">
+                    </div>
+                </div>
+                <div class="artigiano-text">
+                    <h3 class="artigiano-name">Michele Pietro Lacagnina</h3>
+                    <p class="artigiano-subtitle">Custode di Equilibri Minerali</p>
+                    
+                    <div class="artigiano-bio">
+                        <p>
+                            Marco non è nato artigiano. È diventato ascoltatore di pietre. Cresciuto tra le colline umbre, dove il silenzio ha il peso giusto e la luce sa posarsi senza fretta, ha imparato presto che ogni materiale ha una voce propria. L'ametista sussurra, l'agata racconta, il quarzo canta sottovoce.
+                        </p>
+                        
+                        <div class="artigiano-quote">
+                            "Non costruisco alberi. Li libero. Ogni pietra sa già dove vuole andare. Io sono solo quello che ascolta e segue il suo consiglio."
+                        </div>
+                        
+                        <p>
+                            Dopo anni dedicati alla gemmologia e alla cristalloterapia, Marco ha sviluppato una sensibilità unica nel riconoscere le affinità tra i cristalli e nell'intuire le forme nascoste nella materia grezza. Le sue mani, rese sapienti da migliaia di ore passate tra fili metallici e pietre preziose, sanno modellare il tempo stesso in equilibri sospesi tra terra e cielo.
+                        </p>
+                        
+                        <p>
+                            Ogni albero nasce da una meditazione lunga mesi. Marco studia le pietre, le tiene tra le mani, le osserva in controluce fino a quando non emerge la forma perfetta. Non esiste fretta nel suo laboratorio, solo la pazienza millenaria che i cristalli portano dentro di sé e che lui ha imparato a riconoscere come la più alta forma di saggezza artistica.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     
     <!-- Sezione Ispirazione -->
     <section class="ispirazione">
@@ -655,6 +832,7 @@ Chi lo guarda sente silenzio. Ma anche attesa.</p>
             </div>
         </div>
     </section>
+    
     
     <!-- Sezione Contatti -->
     <section class="contatti">
