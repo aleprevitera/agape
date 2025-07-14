@@ -174,7 +174,7 @@
             }
 
             .filtri-container.visible {
-                max-height: 2000px;
+                max-height: 3000px;
                 opacity: 1;
                 transform: translateY(0);
                 padding: 2rem;
@@ -757,6 +757,10 @@
             }
 }
             @media (max-width: 768px) {
+                .filtri-container.visible {
+                    max-height: none; /* Altezza illimitata su mobile */
+                }
+                
                 .hero {
                     padding: 2rem 0;
                 }
@@ -833,7 +837,7 @@
                 <div class="filtri-trigger">
                     <button class="btn-filtri-toggle" onclick="toggleFiltri()">
                         <span class="icon">⬇</span>
-                        <span class="text">Filtra le Creazioni</span>
+                        <span class="text">Filtra per Materiale</span>
                     </button>
                 </div>
                 
@@ -848,24 +852,6 @@
                         </div>
                         
                         <div class="filtri-grid">
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Quarzi</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
-                                    <img src="https://i.postimg.cc/Fs9NDm8h/granato-bianco.png" alt="Quarzo Bianco" class="material-image">
-                                    <label for="m-quarzo-bianco">Quarzo Bianco</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
-                                    <label for="m-quarzo-rosa">Quarzo Rosa</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
-                                    <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
-                                </div>
-                            </div>
                             
                             <div class="filtro-gruppo">
                                 <div class="filtro-categoria">Agate</div>
@@ -902,6 +888,25 @@
                                     <input type="checkbox" id="m-olivina" data-material="olivina" data-type="materiali">
                                     <img src="https://i.postimg.cc/j2FRmsxk/f36c1839-79c4-4791-a875-7e0f1d65039b.png" alt="Olivina" class="material-image">
                                     <label for="m-olivina">Olivina</label>
+                                </div>
+                            </div>
+
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Quarzi</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
+                                    <img src="https://i.postimg.cc/Fs9NDm8h/granato-bianco.png" alt="Quarzo Bianco" class="material-image">
+                                    <label for="m-quarzo-bianco">Quarzo Bianco</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
+                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
+                                    <label for="m-quarzo-rosa">Quarzo Rosa</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
+                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
+                                    <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
                                 </div>
                             </div>
                         </div>
@@ -1021,7 +1026,7 @@
                     </div>
 
                     <!-- Dolce inverno  -->
-                    <div class="creazione-card" data-materiali="agata-corniola olivina" data-base="ametista-lavanda">
+                    <div class="creazione-card" data-materiali="agata-corniola" data-base="ametista-lavanda">
                         <div class="creazione-image">
                             <img src="https://i.postimg.cc/RFz0fF2G/1000045644.jpg" alt="">
                         </div>
