@@ -1,1336 +1,1447 @@
 <!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L'Arte del Tempo Sospeso</title>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap');
+    <html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>L'Arte del Tempo Sospeso</title>
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --color-crema: #F5F2EA;
-            --color-sabbia: #E8DCC4;
-            --color-oro: #C19A6B;
-            --color-ametista: #9B7AA8;
-            --color-verde-salvia: #87A96B;
-            --color-testo: #3A3A3A;
-            --color-testo-light: #6B6B6B;
-        }
-        
-        body {
-            font-family: 'Lato', sans-serif;
-            color: var(--color-testo);
-            background-color: var(--color-crema);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* Texture di sfondo */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px),
-                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.03) 35px, rgba(255,255,255,.03) 70px);
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        h1, h2, h3 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 400;
-            color: var(--color-testo);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(135deg, var(--color-crema) 0%, var(--color-sabbia) 100%);
-            position: relative;
-        }
-        
-        .hero-content {
-            animation: fadeInUp 1.2s ease-out;
-        }
-        
-        .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            margin-bottom: 1rem;
-            letter-spacing: 2px;
-        }
-        
-        .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            color: var(--color-testo-light);
-            font-weight: 300;
-            font-style: italic;
-        }
-        
-        .hero-image {
-            width: 300px;
-            height: 300px;
-            margin: 3rem auto;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .hero-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        /* Sezione Creazioni */
-        .creazioni {
-            padding: 80px 0;
-            background-color: #fff;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: clamp(2rem, 4vw, 3rem);
-            margin-bottom: 3rem;
-            color: var(--color-oro);
-        }
-
-        /* Sistema di Filtri */
-        .filtri-container {
-            background: var(--color-crema);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            border: 1px solid var(--color-sabbia);
-        }
-
-        .filtri-title {
-            text-align: center;
-            font-size: 1.8rem;
-            color: var(--color-oro);
-            margin-bottom: 2rem;
-            font-family: 'Playfair Display', serif;
-        }
-
-        .filtri-sezione-unica {
-            margin-bottom: 2rem;
-        }
-
-        .filtri-sezione-titolo {
-            margin: 2.5rem 0 1.5rem 0;
-            padding: 1rem 0;
-            border-bottom: 2px solid var(--color-oro);
-            position: relative;
-        }
-
-        .filtri-sezione-titolo:first-child {
-            margin-top: 0;
-        }
-
-        .filtri-sezione-titolo h4 {
-            text-align: center;
-            font-size: 1.4rem;
-            color: var(--color-oro);
-            font-family: 'Playfair Display', serif;
-            margin: 0;
-            padding: 0 1rem;
-            background: var(--color-crema);
-            position: relative;
-            z-index: 1;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .filtri-sezione-titolo::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--color-oro);
-            z-index: 0;
-            opacity: 0.3;
-        }
-
-        .filtri-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .filtro-gruppo {
-            background: #fff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 2px solid var(--color-sabbia);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .filtro-gruppo:hover {
-            border-color: var(--color-oro);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .filtro-categoria {
-            font-weight: bold;
-            color: var(--color-ametista);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            text-align: center;
-            font-family: 'Playfair Display', serif;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            border-bottom: 1px solid var(--color-sabbia);
-            padding-bottom: 0.5rem;
-        }
-
-        .filtro-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            padding: 0.8rem;
-            border-radius: 8px;
-            background: rgba(245, 242, 234, 0.5);
-        }
-
-        .filtro-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .filtro-item:hover {
-            background: rgba(193, 154, 107, 0.15);
-        }
-
-        .filtro-item input[type="checkbox"] {
-            margin-right: 0.8rem;
-            cursor: pointer;
-            transform: scale(1.2);
-            accent-color: var(--color-oro);
-        }
-
-        .material-image {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            margin-right: 0.8rem;
-            border: 2px solid var(--color-sabbia);
-            object-fit: cover;
-            transition: border-color 0.3s ease;
-        }
-
-        .filtro-item:hover .material-image {
-            border-color: var(--color-oro);
-        }
-
-        .filtro-item label {
-            cursor: pointer;
-            flex: 1;
-            font-size: 0.95rem;
-            color: var(--color-testo-light);
-            transition: color 0.3s ease;
-            font-weight: 400;
-        }
-
-        .filtro-item:hover label {
-            color: var(--color-oro);
-            font-weight: 500;
-        }
-
-        .filtri-azioni {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-filtro {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Playfair Display', serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-reset {
-            background: var(--color-ametista);
-            color: white;
-        }
-
-        .btn-reset:hover {
-            background: var(--color-oro);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .btn-mostra-tutti {
-            background: var(--color-verde-salvia);
-            color: white;
-        }
-
-        .btn-mostra-tutti:hover {
-            background: var(--color-oro);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .risultati-info {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-style: italic;
-            color: var(--color-testo-light);
-            font-size: 1.1rem;
-        }
-
-        .risultati-info.filtrato {
-            color: var(--color-oro);
-            font-weight: bold;
-        }
-        
-        .creazioni-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
-            margin-top: 3rem;
-        }
-        
-        .creazione-card {
-            background: var(--color-crema);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
-        }
-
-        .creazione-card.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            position: absolute;
-            z-index: -1;
-        }
-        
-        .creazione-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-        
-        .creazione-image {
-            height: 500px;
-            background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .creazione-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        
-        .creazione-content {
-            padding: 2rem;
-        }
-        
-        .creazione-name {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            color: var(--color-oro);
-        }
-        
-        .creazione-desc {
-            font-style: italic;
-            color: var(--color-testo-light);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-        
-        .creazione-materials {
-            font-size: 0.9rem;
-            color: var(--color-verde-salvia);
-            border-top: 1px solid var(--color-sabbia);
-            padding-top: 1rem;
-            margin-top: 1rem;
-        }
-        
-        /* Sezione Ispirazione */
-        .ispirazione {
-            padding: 80px 0;
-            background: linear-gradient(135deg, var(--color-crema) 0%, #fff 50%, var(--color-crema) 100%);
-        }
-        
-        .ispirazione-intro {
-            max-width: 800px;
-            margin: 0 auto 4rem;
-            text-align: center;
-            font-size: 1.2rem;
-            line-height: 2;
-            color: var(--color-testo-light);
-            font-style: italic;
-        }
-        
-        .ispirazione-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 3rem;
-            margin-top: 3rem;
-        }
-        
-        .ispirazione-block {
-            text-align: center;
-            padding: 2rem;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease;
-        }
-        
-        .ispirazione-block:hover {
-            transform: translateY(-3px);
-        }
-        
-        .ispirazione-block h3 {
-            font-size: 1.6rem;
-            margin-bottom: 1rem;
-            color: var(--color-ametista);
-        }
-        
-        .ispirazione-block p {
-            color: var(--color-testo-light);
-            line-height: 1.8;
-            text-align: justify;
-            font-size: 1rem;
-        }
-        
-        /* Sezione Artigiano */
-        .artigiano {
-            padding: 80px 0;
-            background-color: #fff;
-            position: relative;
-        }
-        
-        .artigiano::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(139, 169, 107, 0.03) 0%, rgba(155, 122, 168, 0.05) 100%);
-            pointer-events: none;
-        }
-        
-        .artigiano-content {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 4rem;
-            align-items: center;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .artigiano-image {
-            position: relative;
-        }
-        
-        .artigiano-photo {
-            width: 100%;
-            max-width: 400px;
-            aspect-ratio: 4/5;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            position: relative;
-            margin: 0 auto;
-            background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
-        }
-        
-        .artigiano-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-            object-position: top;
-        }
-        
-        .artigiano-photo:hover img {
-            transform: scale(1.05);
-        }
-        
-        /* Cornice decorativa intorno alla foto */
-        .artigiano-photo::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            border: 2px solid var(--color-oro);
-            border-radius: 16px;
-            opacity: 0.3;
-            z-index: -1;
-        }
-        
-        .artigiano-text {
-            padding: 2rem 0;
-        }
-        
-        .artigiano-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: var(--color-oro);
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-        }
-        
-        .artigiano-subtitle {
-            font-size: 1.2rem;
-            color: var(--color-ametista);
-            font-style: italic;
-            margin-bottom: 2rem;
-            font-weight: 300;
-        }
-        
-        .artigiano-bio {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--color-testo-light);
-            text-align: justify;
-        }
-        
-        .artigiano-bio p {
-            margin-bottom: 1.5rem;
-        }
-        
-        .artigiano-bio p:last-child {
-            margin-bottom: 0;
-        }
-        
-        .artigiano-quote {
-            background: var(--color-crema);
-            padding: 2rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-            border-left: 4px solid var(--color-oro);
-            font-style: italic;
-            font-size: 1.1rem;
-            color: var(--color-testo);
-            position: relative;
-        }
-        
-        .artigiano-quote::before {
-            content: '"';
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: var(--color-oro);
-            position: absolute;
-            top: -10px;
-            left: 1rem;
-            opacity: 0.3;
-        }
-        
-        /* Sezione Contatti */
-        .contatti {
-            padding: 80px 0;
-            background-color: #fff;
-        }
-        
-        .contact-form {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--color-crema);
-            padding: 3rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--color-testo);
-            font-weight: 400;
-        }
-        
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--color-sabbia);
-            border-radius: 6px;
-            background: #fff;
-            font-family: inherit;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--color-oro);
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-        
-        .submit-btn {
-            background: var(--color-oro);
-            color: #fff;
-            border: none;
-            padding: 14px 32px;
-            font-size: 1.1rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            margin: 2rem auto 0;
-            font-family: 'Playfair Display', serif;
-            letter-spacing: 1px;
-        }
-        
-        .submit-btn:hover {
-            background: var(--color-ametista);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        /* Footer */
-        footer {
-            background: var(--color-testo);
-            color: var(--color-crema);
-            padding: 3rem 0;
-            text-align: center;
-        }
-        
-        .footer-quote {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
-            font-style: italic;
-            margin-bottom: 2rem;
-            letter-spacing: 1px;
-        }
-        
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-        }
-        
-        .social-links a {
-            color: var(--color-crema);
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: color 0.3s ease;
-        }
-        
-        .social-links a:hover {
-            color: var(--color-oro);
-        }
-        
-        /* Animazioni */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap');
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            :root {
+                --color-crema: #F5F2EA;
+                --color-sabbia: #E8DCC4;
+                --color-oro: #C19A6B;
+                --color-ametista: #9B7AA8;
+                --color-verde-salvia: #87A96B;
+                --color-testo: #3A3A3A;
+                --color-testo-light: #6B6B6B;
             }
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
+            
+            body {
+                font-family: 'Lato', sans-serif;
+                color: var(--color-testo);
+                background-color: var(--color-crema);
+                line-height: 1.6;
+                overflow-x: hidden;
             }
-            50% {
-                transform: translateY(-20px);
+            
+            /* Texture di sfondo */
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: 
+                    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px),
+                    repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.03) 35px, rgba(255,255,255,.03) 70px);
+                pointer-events: none;
+                z-index: 1;
             }
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
+            
+            h1, h2, h3 {
+                font-family: 'Playfair Display', serif;
+                font-weight: 400;
+                color: var(--color-testo);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px;
+                position: relative;
+                z-index: 2;
+            }
+            
+            /* Hero Section */
             .hero {
-                padding: 2rem 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                background: linear-gradient(135deg, var(--color-crema) 0%, var(--color-sabbia) 100%);
+                position: relative;
+            }
+            
+            .hero-content {
+                animation: fadeInUp 1.2s ease-out;
+            }
+            
+            .hero h1 {
+                font-size: clamp(2.5rem, 5vw, 4rem);
+                margin-bottom: 1rem;
+                letter-spacing: 2px;
+            }
+            
+            .hero p {
+                font-size: clamp(1.1rem, 2vw, 1.4rem);
+                color: var(--color-testo-light);
+                font-weight: 300;
+                font-style: italic;
             }
             
             .hero-image {
-                width: 250px;
-                height: 250px;
-            }
-
-            .filtri-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filtri-azioni {
-                flex-direction: column;
-            }
-
-            .filtri-sezione-titolo h4 {
-                font-size: 1.2rem;
+                width: 300px;
+                height: 300px;
+                margin: 3rem auto;
+                border-radius: 50%;
+                overflow: hidden;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                animation: float 6s ease-in-out infinite;
             }
             
-            .creazioni-grid,
-            .ispirazione-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+            .hero-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
             
-            .artigiano-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-                text-align: center;
-            }
-            
-            .artigiano-photo {
-                max-width: 300px;
-            }
-            
-            .artigiano-name {
-                font-size: 2rem;
-            }
-            
-            .contact-form {
-                padding: 2rem;
+            /* Sezione Creazioni */
+            .creazioni {
+                padding: 80px 0;
+                background-color: #fff;
             }
             
             .section-title {
-                font-size: 2rem;
+                text-align: center;
+                font-size: clamp(2rem, 4vw, 3rem);
+                margin-bottom: 3rem;
+                color: var(--color-oro);
             }
-        }
-    </style>
-</head>
-<body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>L'Arte del Tempo Sospeso</h1>
-                <p>Ogni albero nasce da un dialogo silenzioso con la natura. Osserviamo i biomi del mondo e ne catturiamo l'essenza in miniature preziose. Non sono semplici decorazioni: sono portali verso mondi interiori, meditazioni tangibili sulla bellezza effimera e l'eternità racchiusa in un istante.</p>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Sezione Creazioni -->
-    <section class="creazioni">
-        <div class="container">
-            <h2 class="section-title">Le Nostre Creazioni</h2>
+
+            /* Bottone per Mostrare Filtri */
+            .filtri-trigger {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            .btn-filtri-toggle {
+                background: linear-gradient(135deg, var(--color-oro) 0%, var(--color-ametista) 100%);
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 30px;
+                cursor: pointer;
+                font-family: 'Playfair Display', serif;
+                font-size: 1.1rem;
+                font-weight: 400;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin: 0 auto;
+            }
+
+            .btn-filtri-toggle:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+                background: linear-gradient(135deg, var(--color-ametista) 0%, var(--color-oro) 100%);
+            }
+
+            .btn-filtri-toggle .icon {
+                transition: transform 0.3s ease;
+                font-size: 1.2rem;
+            }
+
+            .btn-filtri-toggle.active .icon {
+                transform: rotate(180deg);
+            }
+
+            /* Sistema di Filtri */
+            .filtri-container {
+                background: var(--color-crema);
+                border-radius: 16px;
+                padding: 0;
+                margin-bottom: 3rem;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+                border: 1px solid var(--color-sabbia);
+                overflow: hidden;
+                max-height: 0;
+                opacity: 0;
+                transition: all 0.5s ease;
+                transform: translateY(-20px);
+            }
+
+            .filtri-container.visible {
+                max-height: 2000px;
+                opacity: 1;
+                transform: translateY(0);
+                padding: 2rem;
+            }
+
+            .filtri-title {
+                text-align: center;
+                font-size: 1.8rem;
+                color: var(--color-oro);
+                margin-bottom: 2rem;
+                font-family: 'Playfair Display', serif;
+            }
+
+            .filtri-sezione-unica {
+                margin-bottom: 2rem;
+            }
+
+            .filtri-sezione-titolo {
+                margin: 2.5rem 0 1.5rem 0;
+                padding: 1rem 0;
+                border-bottom: 2px solid var(--color-oro);
+                position: relative;
+            }
+
+            .filtri-sezione-titolo:first-child {
+                margin-top: 0;
+            }
+
+            .filtri-sezione-titolo h4 {
+                text-align: center;
+                font-size: 1.4rem;
+                color: var(--color-oro);
+                font-family: 'Playfair Display', serif;
+                margin: 0;
+                padding: 0 1rem;
+                background: var(--color-crema);
+                position: relative;
+                z-index: 1;
+                display: inline-block;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .filtri-sezione-titolo::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: var(--color-oro);
+                z-index: 0;
+                opacity: 0.3;
+            }
+
+            .filtri-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .filtro-gruppo {
+                background: #fff;
+                border-radius: 12px;
+                padding: 1.5rem;
+                border: 2px solid var(--color-sabbia);
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            }
+
+            .filtro-gruppo:hover {
+                border-color: var(--color-oro);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+            .filtro-categoria {
+                font-weight: bold;
+                color: var(--color-ametista);
+                margin-bottom: 1rem;
+                font-size: 1rem;
+                text-align: center;
+                font-family: 'Playfair Display', serif;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                hyphens: auto;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                border-bottom: 1px solid var(--color-sabbia);
+                padding-bottom: 0.5rem;
+            }
+
+            .filtro-item {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                padding: 0.8rem;
+                border-radius: 8px;
+                background: rgba(245, 242, 234, 0.5);
+            }
+
+            .filtro-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .filtro-item:hover {
+                background: rgba(193, 154, 107, 0.15);
+            }
+
+            .filtro-item input[type="checkbox"] {
+                margin-right: 0.8rem;
+                cursor: pointer;
+                transform: scale(1.2);
+                accent-color: var(--color-oro);
+            }
+
+            .material-image {
+                width: 84px;
+                height: 84px;
+                border-radius: 50%;
+                margin-right: 0.8rem;
+                border: 2px solid var(--color-sabbia);
+                object-fit: cover;
+                transition: border-color 0.3s ease;
+            }
+
+            .filtro-item:hover .material-image {
+                border-color: var(--color-oro);
+            }
+
+            .filtro-item label {
+                cursor: pointer;
+                flex: 1;
+                font-size: 0.95rem;
+                color: var(--color-testo-light);
+                transition: color 0.3s ease;
+                font-weight: 400;
+            }
+
+            .filtro-item:hover label {
+                color: var(--color-oro);
+                font-weight: 500;
+            }
+
+            .filtri-azioni {
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .btn-filtro {
+                padding: 0.8rem 1.5rem;
+                border: none;
+                border-radius: 25px;
+                cursor: pointer;
+                font-family: 'Playfair Display', serif;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                font-weight: 400;
+                letter-spacing: 0.5px;
+            }
+
+            .btn-reset {
+                background: var(--color-ametista);
+                color: white;
+            }
+
+            .btn-reset:hover {
+                background: var(--color-oro);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+
+            .btn-mostra-tutti {
+                background: var(--color-verde-salvia);
+                color: white;
+            }
+
+            .btn-mostra-tutti:hover {
+                background: var(--color-oro);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+
+            .risultati-info {
+                text-align: center;
+                margin-bottom: 2rem;
+                font-style: italic;
+                color: var(--color-testo-light);
+                font-size: 1.1rem;
+                transition: all 0.3s ease;
+            }
+
+            .risultati-info.filtrato {
+                color: var(--color-oro);
+                font-weight: bold;
+            }
             
-            <!-- Sistema di Filtri -->
-            <div class="filtri-container">
-                <h3 class="filtri-title">Esplora per Materiali</h3>
+            .creazioni-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                justify-content: start;
+                gap: 3rem;
+                margin-top: 3rem;
+            }
+            
+            .creazione-card {
+                background: var(--color-crema);
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            }
+
+            .creazione-card.hidden {
+                opacity: 0;
+                transform: scale(0.95);
+                pointer-events: none;
+                position: absolute;
+                z-index: -1;
+            }
+            
+            .creazione-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            }
+            
+            .creazione-image {
+                height: 500px;
+                background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .creazione-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            
+            .creazione-content {
+                padding: 2rem;
+            }
+            
+            .creazione-name {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+                color: var(--color-oro);
+            }
+            
+            .creazione-desc {
+                font-style: italic;
+                color: var(--color-testo-light);
+                margin-bottom: 1rem;
+                line-height: 1.5;
+            }
+            
+            .creazione-materials {
+                font-size: 0.9rem;
+                color: var(--color-verde-salvia);
+                border-top: 1px solid var(--color-sabbia);
+                padding-top: 1rem;
+                margin-top: 1rem;
+            }
+            
+            /* Sezione Ispirazione */
+            .ispirazione {
+                padding: 80px 0;
+                background: linear-gradient(135deg, var(--color-crema) 0%, #fff 50%, var(--color-crema) 100%);
+            }
+            
+            .ispirazione-intro {
+                max-width: 800px;
+                margin: 0 auto 4rem;
+                text-align: center;
+                font-size: 1.2rem;
+                line-height: 2;
+                color: var(--color-testo-light);
+                font-style: italic;
+            }
+            
+            .ispirazione-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 3rem;
+                margin-top: 3rem;
+            }
+            
+            .ispirazione-block {
+                text-align: center;
+                padding: 2rem;
+                border-radius: 8px;
+                background: rgba(255,255,255,0.7);
+                backdrop-filter: blur(10px);
+                transition: transform 0.3s ease;
+            }
+            
+            .ispirazione-block:hover {
+                transform: translateY(-3px);
+            }
+            
+            .ispirazione-block h3 {
+                font-size: 1.6rem;
+                margin-bottom: 1rem;
+                color: var(--color-ametista);
+            }
+            
+            .ispirazione-block p {
+                color: var(--color-testo-light);
+                line-height: 1.8;
+                text-align: justify;
+                font-size: 1rem;
+            }
+            
+            /* Sezione Artigiano */
+            .artigiano {
+                padding: 80px 0;
+                background-color: #fff;
+                position: relative;
+            }
+            
+            .artigiano::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(139, 169, 107, 0.03) 0%, rgba(155, 122, 168, 0.05) 100%);
+                pointer-events: none;
+            }
+            
+            .artigiano-content {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 4rem;
+                align-items: center;
+                position: relative;
+                z-index: 2;
+            }
+            
+            .artigiano-image {
+                position: relative;
+            }
+            
+            .artigiano-photo {
+                width: 100%;
+                max-width: 400px;
+                aspect-ratio: 4/5;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+                position: relative;
+                margin: 0 auto;
+                background: linear-gradient(135deg, var(--color-sabbia) 0%, var(--color-crema) 100%);
+            }
+            
+            .artigiano-photo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+                object-position: top;
+            }
+            
+            .artigiano-photo:hover img {
+                transform: scale(1.05);
+            }
+            
+            /* Cornice decorativa intorno alla foto */
+            .artigiano-photo::before {
+                content: '';
+                position: absolute;
+                top: -10px;
+                left: -10px;
+                right: -10px;
+                bottom: -10px;
+                border: 2px solid var(--color-oro);
+                border-radius: 16px;
+                opacity: 0.3;
+                z-index: -1;
+            }
+            
+            .artigiano-text {
+                padding: 2rem 0;
+            }
+            
+            .artigiano-name {
+                font-family: 'Playfair Display', serif;
+                font-size: 2.5rem;
+                color: var(--color-oro);
+                margin-bottom: 0.5rem;
+                letter-spacing: 1px;
+            }
+            
+            .artigiano-subtitle {
+                font-size: 1.2rem;
+                color: var(--color-ametista);
+                font-style: italic;
+                margin-bottom: 2rem;
+                font-weight: 300;
+            }
+            
+            .artigiano-bio {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: var(--color-testo-light);
+                text-align: justify;
+            }
+            
+            .artigiano-bio p {
+                margin-bottom: 1.5rem;
+            }
+            
+            .artigiano-bio p:last-child {
+                margin-bottom: 0;
+            }
+            
+            .artigiano-quote {
+                background: var(--color-crema);
+                padding: 2rem;
+                border-radius: 8px;
+                margin: 2rem 0;
+                border-left: 4px solid var(--color-oro);
+                font-style: italic;
+                font-size: 1.1rem;
+                color: var(--color-testo);
+                position: relative;
+            }
+            
+            .artigiano-quote::before {
+                content: '"';
+                font-family: 'Playfair Display', serif;
+                font-size: 3rem;
+                color: var(--color-oro);
+                position: absolute;
+                top: -10px;
+                left: 1rem;
+                opacity: 0.3;
+            }
+            
+            /* Sezione Contatti */
+            .contatti {
+                padding: 80px 0;
+                background-color: #fff;
+            }
+            
+            .contact-form {
+                max-width: 600px;
+                margin: 0 auto;
+                background: var(--color-crema);
+                padding: 3rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--color-testo);
+                font-weight: 400;
+            }
+            
+            .form-group input,
+            .form-group textarea {
+                width: 100%;
+                padding: 12px 16px;
+                border: 1px solid var(--color-sabbia);
+                border-radius: 6px;
+                background: #fff;
+                font-family: inherit;
+                font-size: 1rem;
+                transition: border-color 0.3s ease;
+            }
+            
+            .form-group input:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: var(--color-oro);
+            }
+            
+            .form-group textarea {
+                resize: vertical;
+                min-height: 120px;
+            }
+            
+            .submit-btn {
+                background: var(--color-oro);
+                color: #fff;
+                border: none;
+                padding: 14px 32px;
+                font-size: 1.1rem;
+                border-radius: 30px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: block;
+                margin: 2rem auto 0;
+                font-family: 'Playfair Display', serif;
+                letter-spacing: 1px;
+            }
+            
+            .submit-btn:hover {
+                background: var(--color-ametista);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            }
+            
+            /* Footer */
+            footer {
+                background: var(--color-testo);
+                color: var(--color-crema);
+                padding: 3rem 0;
+                text-align: center;
+            }
+            
+            .footer-quote {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.4rem;
+                font-style: italic;
+                margin-bottom: 2rem;
+                letter-spacing: 1px;
+            }
+            
+            .social-links {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+            }
+            
+            .social-links a {
+                color: var(--color-crema);
+                text-decoration: none;
+                font-size: 1.1rem;
+                transition: color 0.3s ease;
+            }
+            
+            .social-links a:hover {
+                color: var(--color-oro);
+            }
+            
+            /* Animazioni */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            @keyframes float {
+                0%, 100% {
+                    transform: translateY(0);
+                }
+                50% {
+                    transform: translateY(-20px);
+                }
+            }
+            
+            /* Responsive */
+            @media (max-width: 1024px) and (min-width: 769px) {
+            .creazioni-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+}
+            @media (max-width: 768px) {
+                .hero {
+                    padding: 2rem 0;
+                }
                 
-                <div class="filtri-sezione-unica">
-                    <!-- Materiali delle Foglie -->
-                    <div class="filtri-sezione-titolo">
-                        <h4>Materiali delle Foglie</h4>
+                .hero-image {
+                    width: 250px;
+                    height: 250px;
+                }
+
+                .filtri-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .filtri-azioni {
+                    flex-direction: column;
+                }
+
+                .filtri-sezione-titolo h4 {
+                    font-size: 1.2rem;
+                }
+
+                .btn-filtri-toggle {
+                    font-size: 1rem;
+                    padding: 0.8rem 1.5rem;
+                }
+                
+                .creazioni-grid,
+                .ispirazione-grid {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+                
+                .artigiano-content {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                    text-align: center;
+                }
+                
+                .artigiano-photo {
+                    max-width: 300px;
+                }
+                
+                .artigiano-name {
+                    font-size: 2rem;
+                }
+                
+                .contact-form {
+                    padding: 2rem;
+                }
+                
+                .section-title {
+                    font-size: 2rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>L'Arte del Tempo Sospeso</h1>
+                    <p>Ogni albero nasce da un dialogo silenzioso con la natura. Osserviamo i biomi del mondo e ne catturiamo l'essenza in miniature preziose. Non sono semplici decorazioni: sono portali verso mondi interiori, meditazioni tangibili sulla bellezza effimera e l'eternità racchiusa in un istante.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Sezione Creazioni -->
+        <section class="creazioni">
+            <div class="container">
+                <h2 class="section-title">Le Nostre Creazioni</h2>
+                
+                <!-- Trigger per mostrare filtri -->
+                <div class="filtri-trigger">
+                    <button class="btn-filtri-toggle" onclick="toggleFiltri()">
+                        <span class="icon">⬇</span>
+                        <span class="text">Filtra le Creazioni</span>
+                    </button>
+                </div>
+                
+                <!-- Sistema di Filtri (nascosto di default) -->
+                <div class="filtri-container" id="filtri-container">
+                    <h3 class="filtri-title">Esplora per Materiali</h3>
+                    
+                    <div class="filtri-sezione-unica">
+                        <!-- Materiali delle Foglie -->
+                        <div class="filtri-sezione-titolo">
+                            <h4>Foglie</h4>
+                        </div>
+                        
+                        <div class="filtri-grid">
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Quarzi</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
+                                    <img src="https://i.postimg.cc/Fs9NDm8h/granato-bianco.png" alt="Quarzo Bianco" class="material-image">
+                                    <label for="m-quarzo-bianco">Quarzo Bianco</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
+                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
+                                    <label for="m-quarzo-rosa">Quarzo Rosa</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
+                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
+                                    <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
+                                </div>
+                            </div>
+                            
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Agate</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-agata-corniola" data-material="agata-corniola" data-type="materiali">
+                                    <img src="https://i.postimg.cc/zDtKw6Zy/dc0ea533-6a69-441e-bced-42884ca3e468.png" alt="Agata Corniola" class="material-image">
+                                    <label for="m-agata-corniola">Agata Corniola</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-agata-verde" data-material="agata-verde" data-type="materiali">
+                                    <img src="https://i.postimg.cc/gjTSVz8Y/agata-verde.png" alt="Agata Verde" class="material-image">
+                                    <label for="m-agata-verde">Agata Verde</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-agata-blu" data-material="agata-blu" data-type="materiali">
+                                    <img src="https://i.postimg.cc/ht3ZFkg7/Chat-GPT-Image-14-lug-2025-14-02-30.png" alt="Agata Blu" class="material-image">
+                                    <label for="m-agata-blu">Agata Blu</label>
+                                </div>
+                            </div>
+                            
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Altri Minerali</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-labradorite" data-material="labradorite" data-type="materiali">
+                                    <img src="https://i.postimg.cc/3RcvC04k/Chat-GPT-Image-14-lug-2025-14-27-17.png" alt="Labradorite" class="material-image">
+                                    <label for="m-labradorite">Labradorite</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-granato" data-material="granato" data-type="materiali">
+                                    <img src="https://i.postimg.cc/P5WZYcr8/Chat-GPT-Image-14-lug-2025-14-14-24.png" alt="Granato" class="material-image">
+                                    <label for="m-granato">Granato</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="m-olivina" data-material="olivina" data-type="materiali">
+                                    <img src="https://i.postimg.cc/j2FRmsxk/f36c1839-79c4-4791-a875-7e0f1d65039b.png" alt="Olivina" class="material-image">
+                                    <label for="m-olivina">Olivina</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Materiali della Base -->
+                        <div class="filtri-sezione-titolo">
+                            <h4>Base</h4>
+                        </div>
+                        
+                        <div class="filtri-grid">
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Ametiste</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="b-ametista" data-material="ametista" data-type="base">
+                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Ametista" class="material-image">
+                                    <label for="b-ametista">Ametista</label>
+                                </div>
+                            </div>
+                            
+                            <div class="filtro-gruppo">
+                                <div class="filtro-categoria">Pietre Naturali</div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="b-pietra-calcarea" data-material="pietra-calcarea" data-type="base">
+                                    <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=100&h=100&fit=crop&crop=center" alt="Pietra Calcarea" class="material-image">
+                                    <label for="b-pietra-calcarea">Pietra Calcarea</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="b-marmo" data-material="marmo" data-type="base">
+                                    <img src="https://images.unsplash.com/photo-1509909756405-be0199881695?w=100&h=100&fit=crop&crop=center" alt="Marmo" class="material-image">
+                                    <label for="b-marmo">Marmo</label>
+                                </div>
+                                <div class="filtro-item">
+                                    <input type="checkbox" id="b-quarzo-grezzo" data-material="quarzo-grezzo" data-type="base">
+                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
+                                    <label for="b-quarzo-grezzo">Quarzo Grezzo</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="filtri-grid">
-                        <div class="filtro-gruppo">
-                            <div class="filtro-categoria">Quarzi</div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Quarzo Bianco" class="material-image">
-                                <label for="m-quarzo-bianco">Quarzo Bianco</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
-                                <label for="m-quarzo-rosa">Quarzo Rosa</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
-                                <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
-                            </div>
+                    <div class="filtri-azioni">
+                        <button class="btn-filtro btn-reset" onclick="resetFiltri()">Resetta Filtri</button>
+                        <button class="btn-filtro btn-mostra-tutti" onclick="mostraTutti()">Mostra Tutti</button>
+                    </div>
+                </div>
+
+                <div class="risultati-info" id="risultati-info">
+                    Tutte le creazioni (16 alberi)
+                </div>
+                
+                <div class="creazioni-grid">
+                    <!-- Rosso di Kyoto -->
+                    <div class="creazione-card" data-materiali="agata-corniola" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/Fzv07YCy/1000045522.jpg" alt="">
                         </div>
-                        
-                        <div class="filtro-gruppo">
-                            <div class="filtro-categoria">Agate</div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-agata-corniola" data-material="agata-corniola" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1569838275086-4e71b1b4a6c7?w=100&h=100&fit=crop&crop=center" alt="Agata Corniola" class="material-image">
-                                <label for="m-agata-corniola">Agata Corniola</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-agata-verde" data-material="agata-verde" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1583486937959-0c6a5f6d7c6c?w=100&h=100&fit=crop&crop=center" alt="Agata Verde" class="material-image">
-                                <label for="m-agata-verde">Agata Verde</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-agata-blu" data-material="agata-blu" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=100&h=100&fit=crop&crop=center" alt="Agata Blu" class="material-image">
-                                <label for="m-agata-blu">Agata Blu</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-agata-rossa" data-material="agata-rossa" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1509368863317-dddadc1ad69f?w=100&h=100&fit=crop&crop=center" alt="Agata Rossa" class="material-image">
-                                <label for="m-agata-rossa">Agata Rossa</label>
-                            </div>
-                        </div>
-                        
-                        <div class="filtro-gruppo">
-                            <div class="filtro-categoria">Altri Minerali</div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-labradorite" data-material="labradorite" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1599582909646-e8e1c2e3c7b4?w=100&h=100&fit=crop&crop=center" alt="Labradorite" class="material-image">
-                                <label for="m-labradorite">Labradorite</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-granato" data-material="granato" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=100&h=100&fit=crop&crop=center" alt="Granato" class="material-image">
-                                <label for="m-granato">Granato</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="m-olivina" data-material="olivina" data-type="materiali">
-                                <img src="https://images.unsplash.com/photo-1605967230828-a5c8e4e6e5c2?w=100&h=100&fit=crop&crop=center" alt="Olivina" class="material-image">
-                                <label for="m-olivina">Olivina</label>
-                            </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Rosso di Kyoto</h3>
+                            <p class="creazione-desc">
+                            Ispirato ai giardini zen di Kyoto durante il Momijigari, Rosso di Kyoto celebra l'autunno nella sua forma più pura e poetica. Le gemme in agata corniola evocano le chiome infuocate degli aceri giapponesi, mentre la base in ametista richiama le brume mattutine che accarezzano le pietre nei templi.
+                        </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Agata corniola<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
                         </div>
                     </div>
                     
-                    <!-- Materiali della Base -->
-                    <div class="filtri-sezione-titolo">
-                        <h4>Materiali della Base</h4>
+                    <!-- Tundra  -->
+                    <div class="creazione-card" data-materiali="quarzo-bianco" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/VsMwjDDs/1000045648.jpg" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Tundra</h3>
+                            <p class="creazione-desc">
+                            Un albero di silenzio e luce. Tundra nasce dove la terra incontra il ghiaccio, e ogni gemma bianca racconta la poesia dell'essenziale. La base in ametista illumina la scena come un crepuscolo nordico, sospeso tra pace e mistero.                        </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Quarzo bianco<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Selva -->
+                    <div class="creazione-card" data-materiali="agata-verde" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/g0bWnRbt/1000045642.jpg" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Selva</h3>
+                            <p class="creazione-desc">
+                                Un inno alla vita selvaggia e incontaminata. Selva è un albero che pulsa di vitalità, con foglie di agata verde che evocano le fronde fitte di una foresta lussureggiante. La base in ametista, come una radura velata dalla rugiada, aggiunge mistero e profondità.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Agata verde<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
                     </div>
                     
-                    <div class="filtri-grid">
-                        <div class="filtro-gruppo">
-                            <div class="filtro-categoria">Ametiste</div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="b-ametista" data-material="ametista" data-type="base">
-                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Ametista" class="material-image">
-                                <label for="b-ametista">Ametista</label>
-                            </div>
+                    <!-- Laguna  -->
+                    <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/s213Fyys/1000045646.jpg" alt="">
                         </div>
-                        
-                        <div class="filtro-gruppo">
-                            <div class="filtro-categoria">Pietre Naturali</div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="b-pietra-calcarea" data-material="pietra-calcarea" data-type="base">
-                                <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=100&h=100&fit=crop&crop=center" alt="Pietra Calcarea" class="material-image">
-                                <label for="b-pietra-calcarea">Pietra Calcarea</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="b-marmo" data-material="marmo" data-type="base">
-                                <img src="https://images.unsplash.com/photo-1509909756405-be0199881695?w=100&h=100&fit=crop&crop=center" alt="Marmo" class="material-image">
-                                <label for="b-marmo">Marmo</label>
-                            </div>
-                            <div class="filtro-item">
-                                <input type="checkbox" id="b-quarzo-grezzo" data-material="quarzo-grezzo" data-type="base">
-                                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
-                                <label for="b-quarzo-grezzo">Quarzo Grezzo</label>
-                            </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Laguna</h3>
+                            <p class="creazione-desc">
+                                Un albero nato dall'acqua e dalla quiete. Le sue gemme blu e verdi galleggiano tra i rami come riflessi in una laguna profonda, mentre la base in ametista richiama le pietre lisce del fondale illuminate dalla luna. Laguna è introspezione, respiro lento, equilibrio silenzioso.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Quarzo rosa<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
                         </div>
                     </div>
-                </div>
-                
-                <div class="filtri-azioni">
-                    <button class="btn-filtro btn-reset" onclick="resetFiltri()">Resetta Filtri</button>
-                    <button class="btn-filtro btn-mostra-tutti" onclick="mostraTutti()">Mostra Tutti</button>
-                </div>
-            </div>
 
-            <div class="risultati-info" id="risultati-info">
-                Tutte le creazioni (16 alberi)
-            </div>
-            
-            <div class="creazioni-grid">
-                <!-- Rosso di Kyoto -->
-                <div class="creazione-card" data-materiali="agata-corniola" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/Fzv07YCy/1000045522.jpg" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Rosso di Kyoto</h3>
-                        <p class="creazione-desc">
-                        Ispirato ai giardini zen di Kyoto durante il Momijigari, Rosso di Kyoto celebra l'autunno nella sua forma più pura e poetica. Le gemme in agata corniola evocano le chiome infuocate degli aceri giapponesi, mentre la base in ametista richiama le brume mattutine che accarezzano le pietre nei templi.
-                    </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Agata corniola<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-                
-                 <!-- Tundra  -->
-                <div class="creazione-card" data-materiali="quarzo-bianco" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/VsMwjDDs/1000045648.jpg" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Tundra</h3>
-                        <p class="creazione-desc">
-                        Un albero di silenzio e luce. Tundra nasce dove la terra incontra il ghiaccio, e ogni gemma bianca racconta la poesia dell'essenziale. La base in ametista illumina la scena come un crepuscolo nordico, sospeso tra pace e mistero.                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo bianco<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Selva -->
-                <div class="creazione-card" data-materiali="agata-verde" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/g0bWnRbt/1000045642.jpg" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Selva</h3>
-                        <p class="creazione-desc">
-                            Un inno alla vita selvaggia e incontaminata. Selva è un albero che pulsa di vitalità, con foglie di agata verde che evocano le fronde fitte di una foresta lussureggiante. La base in ametista, come una radura velata dalla rugiada, aggiunge mistero e profondità.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Agata verde<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Laguna  -->
-                <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/s213Fyys/1000045646.jpg" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Laguna</h3>
-                        <p class="creazione-desc">
-                            Un albero nato dall'acqua e dalla quiete. Le sue gemme blu e verdi galleggiano tra i rami come riflessi in una laguna profonda, mentre la base in ametista richiama le pietre lisce del fondale illuminate dalla luna. Laguna è introspezione, respiro lento, equilibrio silenzioso.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo rosa<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Dolce inverno  -->
-                <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista-lavanda">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/RFz0fF2G/1000045644.jpg" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Dolce Inverno</h3>
-                        <p class="creazione-desc">
-                        Una bacca che resiste al gelo, una scintilla di vita nella stagione più silenziosa. Dolce Inverno è un albero che parla di calore interiore, resilienza e bellezza discreta. Le sue gemme scarlatte si stagliano sui rami dorati come frutti di un tempo sospeso, radicati nella base di ametista che conserva il silenzio delle notti fredde.                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo rosa<br>
-                            <strong>Base:</strong> Ametista lavanda
-                        </p>
-                    </div>
-                </div>
-                <!-- Sakura  -->
-                <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista-lavanda">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/qRt4WNgX/839c477a-40de-4ec1-be1b-18ba8e0a8e0b.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Sakura</h3>
-                        <p class="creazione-desc">
-                            Ispirato alla fioritura dei ciliegi in Giappone, Sakura è un inno alla bellezza del momento presente. Le sue gemme chiarissime sembrano petali sospesi nella luce, mentre la base in ametista raccoglie l'eco silenziosa di un giardino zen. È un albero di grazia, leggerezza e rinascita.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo rosa<br>
-                            <strong>Base:</strong> Ametista lavanda
-                        </p>
-                    </div>
-                </div>
-                <!-- Etere  -->
-                <div class="creazione-card" data-materiali="labradorite" data-base="ametista-lavanda">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/CxQDYZSr/bff74c6a-ac8f-45d4-ba17-89e9ae7584cd.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Etere</h3>
-                        <p class="creazione-desc">
-                            Un albero fuori dal tempo.
-Non ha stagioni, non ha fronde: solo frammenti di luce ordinata, come se il vento avesse deciso di fermarsi e posarsi sui rami. Etere non affonda le radici, galleggia. È il più rarefatto della collezione. Eppure è presente, concreto, semplice. Come il silenzio quando è completo.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Labradorite<br>
-                            <strong>Base:</strong> Ametista lavanda
-                        </p>
-                    </div>
-                </div>
-                <!-- Radice Antica  -->
-                <div class="creazione-card" data-materiali="granato" data-base="pietra-calcarea">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/x8g4sGM1/37dbf8f6-62a6-465b-bc69-55d03aa72703.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Radice Antica</h3>
-                        <p class="creazione-desc">
-                        Nessun fronzolo. Solo radici e pietra.
-                        Radice Antica non vuole essere bello, vuole essere vero. Le sue gemme scure non brillano: assorbono la luce. I rami si aprono bassi, larghi, come se cercassero di proteggere la terra da cui nascono. E quella base ruvida, chiara, non è una roccia: è una memoria.
-                        Un albero che sembra trovato, non costruito.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Granato<br>
-                            <strong>Base:</strong> Pietra calcarea
-                        </p>
-                    </div>
-                </div>
-                <!-- Mistral  -->
-                <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista-lavanda">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/kXqcGt8T/d06df5a5-0de6-4135-b01a-1f32e997bd92.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Mistral</h3>
-                        <p class="creazione-desc">
-                        C'è un vento che passa tra i rami e fa vibrare ogni gemma come se volesse suonarle. Mistral non è un albero fermo: è in viaggio. Viene dal sud, porta con sé il sole, la sabbia, i tramonti. Tocca la terra, ma sogna l'aria. Le sue foglie sono leggere, le radici scaldate da una roccia dorata.
-Un albero nato per chi sorride guardando il cielo.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo rosa<br>
-                            <strong>Base:</strong> Ametista lavanda
-                        </p>
-                    </div>
-                </div>
-                <!-- Campoverde  -->
-                <div class="creazione-card" data-materiali="olivina" data-base="marmo">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/vHKppsc7/43b0c4d3-d95e-4b10-ad4d-0beac733e3bf.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Campoverde</h3>
-                        <p class="creazione-desc">
-                        Non c'è ombra in Campoverde.
-Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostacoli. Le sue foglie sembrano appena spuntate, ancora giovani, quasi timide. Il tronco poggia su una radice scavata, chiara, levigata dal tempo. È un albero di primavera piena, di confine tra natura e gesto umano, tra campo coltivato e prato selvatico.
-                        </p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Olivina<br>
-                            <strong>Base:</strong> Marmo
-                        </p>
-                    </div>
-                </div>
-                <!-- Notturno  -->
-                <div class="creazione-card" data-materiali="agata-blu" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/R0vYyBNF/Chat-GPT-Image-13-lug-2025-10-32-10.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Notturno</h3>
-                        <p class="creazione-desc">Ha la struttura di un pensiero calmo. Notturno non è fatto per essere guardato di fretta. Le sue foglie sembrano note sospese: blu profonde, come l'inizio della notte; lavanda, come la memoria della luce.
-Ogni ramo segue un ritmo, ogni gemma un respiro. La sua base è una partitura di ametista, su cui la composizione si appoggia in silenzio.
-Un albero che non parla. Suona.</p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Agata Blu<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-                <!-- Giada  -->
-                <div class="creazione-card" data-materiali="olivina" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/bJc9W06R/Chat-GPT-Image-13-lug-2025-10-32-22.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Giada</h3>
-                        <p class="creazione-desc">Giada è chiarezza.
-Non ha sfumature, non ha incertezze. Le sue foglie verde limpido riflettono la luce come pensieri ordinati. Cresce in verticale, ma non ha fretta. È un albero semplice, perfetto, riservato.
-E quando tutto intorno si muove, lui resta fermo. Non per rigidità. Per centratura.</p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Olivina<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-                <!-- Custode  -->
-                <div class="creazione-card" data-materiali="granato" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/G2fdb2yz/Chat-GPT-Image-13-lug-2025-10-32-30.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Custode</h3>
-                        <p class="creazione-desc">Custode è un albero che non parla a tutti.
-Le sue gemme rosse sono piene, mature, come frutti o gocce di sangue antico. Ma basta girargli intorno per scoprire il vero cuore: un piccolo totem nascosto, una scala di sette pietre che scendono nel tronco come se portassero un messaggio.
-Cosa protegge? Nessuno lo sa. Ma si capisce subito che non è un albero qualsiasi.</p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Granato rosso<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-                <!-- Bacca d'Oro  -->
-                <div class="creazione-card" data-materiali="agata-rossa" data-base="quarzo-grezzo">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/WpDJgqXN/Chat-GPT-Image-13-lug-2025-10-32-39.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Bacca d'Oro</h3>
-                        <p class="creazione-desc">Non ha bisogno di presentazioni.
-Bacca d'Oro è un albero che si prende il centro. Le sue gemme rosse sembrano mirtilli maturi, ciliegie lucide, piccoli frutti pronti a essere colti. Ma non lo sono.
-Stanno lì per farsi guardare.
-Sotto, una pietra chiara con venature dorate che sembra dire: "questo è il mio terreno". Nessuna poesia, solo presenza.</p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Agata rossa<br>
-                            <strong>Base:</strong> Quarzo grezzo
-                        </p>
-                    </div>
-                </div>
-                <!-- Neve  -->
-                <div class="creazione-card" data-materiali="quarzo-bianco" data-base="ametista">
-                    <div class="creazione-image">
-                        <img src="https://i.postimg.cc/kXK6hr0L/Chat-GPT-Image-13-lug-2025-11-09-12.png" alt="">
-                    </div>
-                    <div class="creazione-content">
-                        <h3 class="creazione-name">Neve</h3>
-                        <p class="creazione-desc">Neve non cresce. Cade.
-Non si espande: atterra. È un albero immobile solo in apparenza. Ogni foglia è un istante in bilico, ogni ramo una traiettoria lieve. Sta in equilibrio tra visibile e invisibile, come le prime nevicate leggere sui campi scuri.
-Chi lo guarda sente silenzio. Ma anche attesa.</p>
-                        <p class="creazione-materials">
-                            <strong>Materiali:</strong> Quarzo bianco<br>
-                            <strong>Base:</strong> Ametista
-                        </p>
-                    </div>
-                </div>
-
-               
-            </div>
-        </div>
-    </section>
-
-    
-    <!-- Sezione Artigiano -->
-    <section class="artigiano">
-        <div class="container">
-            <h2 class="section-title">L'Artigiano</h2>
-            <div class="artigiano-content">
-                <div class="artigiano-image">
-                    <div class="artigiano-photo">
-                        <img src="https://i.postimg.cc/brrV4x4y/MICHELE-BN.jpg" alt="Maestro artigiano al lavoro">
-                    </div>
-                </div>
-                <div class="artigiano-text">
-                    <h3 class="artigiano-name">Michele Pietro Lacagnina</h3>
-                    <p class="artigiano-subtitle">Custode di Equilibri Minerali</p>
-                    
-                    <div class="artigiano-bio">
-                        <p>
-                            Marco non è nato artigiano. È diventato ascoltatore di pietre. Cresciuto tra le colline umbre, dove il silenzio ha il peso giusto e la luce sa posarsi senza fretta, ha imparato presto che ogni materiale ha una voce propria. L'ametista sussurra, l'agata racconta, il quarzo canta sottovoce.
-                        </p>
-                        
-                        <div class="artigiano-quote">
-                            "Non costruisco alberi. Li libero. Ogni pietra sa già dove vuole andare. Io sono solo quello che ascolta e segue il suo consiglio."
+                    <!-- Dolce inverno  -->
+                    <div class="creazione-card" data-materiali="agata-corniola olivina" data-base="ametista-lavanda">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/RFz0fF2G/1000045644.jpg" alt="">
                         </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Dolce Inverno</h3>
+                            <p class="creazione-desc">
+                            Una bacca che resiste al gelo, una scintilla di vita nella stagione più silenziosa. Dolce Inverno è un albero che parla di calore interiore, resilienza e bellezza discreta. Le sue gemme scarlatte si stagliano sui rami dorati come frutti di un tempo sospeso, radicati nella base di ametista che conserva il silenzio delle notti fredde.                        </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Agata corniola<br>
+                                <strong>Base:</strong> Ametista lavanda
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Sakura  -->
+                    <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista-lavanda">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/qRt4WNgX/839c477a-40de-4ec1-be1b-18ba8e0a8e0b.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Sakura</h3>
+                            <p class="creazione-desc">
+                                Ispirato alla fioritura dei ciliegi in Giappone, Sakura è un inno alla bellezza del momento presente. Le sue gemme chiarissime sembrano petali sospesi nella luce, mentre la base in ametista raccoglie l'eco silenziosa di un giardino zen. È un albero di grazia, leggerezza e rinascita.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Quarzo rosa<br>
+                                <strong>Base:</strong> Ametista lavanda
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Etere  -->
+                    <div class="creazione-card" data-materiali="labradorite" data-base="ametista-lavanda">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/CxQDYZSr/bff74c6a-ac8f-45d4-ba17-89e9ae7584cd.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Etere</h3>
+                            <p class="creazione-desc">
+                                Un albero fuori dal tempo.
+    Non ha stagioni, non ha fronde: solo frammenti di luce ordinata, come se il vento avesse deciso di fermarsi e posarsi sui rami. Etere non affonda le radici, galleggia. È il più rarefatto della collezione. Eppure è presente, concreto, semplice. Come il silenzio quando è completo.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Labradorite<br>
+                                <strong>Base:</strong> Ametista lavanda
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Radice Antica  -->
+                    <div class="creazione-card" data-materiali="granato" data-base="pietra-calcarea">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/x8g4sGM1/37dbf8f6-62a6-465b-bc69-55d03aa72703.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Radice Antica</h3>
+                            <p class="creazione-desc">
+                            Nessun fronzolo. Solo radici e pietra.
+                            Radice Antica non vuole essere bello, vuole essere vero. Le sue gemme scure non brillano: assorbono la luce. I rami si aprono bassi, larghi, come se cercassero di proteggere la terra da cui nascono. E quella base ruvida, chiara, non è una roccia: è una memoria.
+                            Un albero che sembra trovato, non costruito.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Granato<br>
+                                <strong>Base:</strong> Pietra calcarea
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Mistral  -->
+                    <div class="creazione-card" data-materiali="quarzo-rosa" data-base="ametista-lavanda">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/kXqcGt8T/d06df5a5-0de6-4135-b01a-1f32e997bd92.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Mistral</h3>
+                            <p class="creazione-desc">
+                            C'è un vento che passa tra i rami e fa vibrare ogni gemma come se volesse suonarle. Mistral non è un albero fermo: è in viaggio. Viene dal sud, porta con sé il sole, la sabbia, i tramonti. Tocca la terra, ma sogna l'aria. Le sue foglie sono leggere, le radici scaldate da una roccia dorata.
+    Un albero nato per chi sorride guardando il cielo.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Quarzo rosa<br>
+                                <strong>Base:</strong> Ametista lavanda
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Campoverde  -->
+                    <div class="creazione-card" data-materiali="olivina" data-base="marmo">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/vHKppsc7/43b0c4d3-d95e-4b10-ad4d-0beac733e3bf.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Campoverde</h3>
+                            <p class="creazione-desc">
+                            Non c'è ombra in Campoverde.
+    Solo vento, sole e una terra aperta dove le piante crescono dritte, senza ostacoli. Le sue foglie sembrano appena spuntate, ancora giovani, quasi timide. Il tronco poggia su una radice scavata, chiara, levigata dal tempo. È un albero di primavera piena, di confine tra natura e gesto umano, tra campo coltivato e prato selvatico.
+                            </p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Olivina<br>
+                                <strong>Base:</strong> Marmo
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Notturno  -->
+                    <div class="creazione-card" data-materiali="agata-blu" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/R0vYyBNF/Chat-GPT-Image-13-lug-2025-10-32-10.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Notturno</h3>
+                            <p class="creazione-desc">Ha la struttura di un pensiero calmo. Notturno non è fatto per essere guardato di fretta. Le sue foglie sembrano note sospese: blu profonde, come l'inizio della notte; lavanda, come la memoria della luce.
+    Ogni ramo segue un ritmo, ogni gemma un respiro. La sua base è una partitura di ametista, su cui la composizione si appoggia in silenzio.
+    Un albero che non parla. Suona.</p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Agata Blu<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Giada  -->
+                    <div class="creazione-card" data-materiali="olivina" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/bJc9W06R/Chat-GPT-Image-13-lug-2025-10-32-22.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Giada</h3>
+                            <p class="creazione-desc">Giada è chiarezza.
+    Non ha sfumature, non ha incertezze. Le sue foglie verde limpido riflettono la luce come pensieri ordinati. Cresce in verticale, ma non ha fretta. È un albero semplice, perfetto, riservato.
+    E quando tutto intorno si muove, lui resta fermo. Non per rigidità. Per centratura.</p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Olivina<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Custode  -->
+                    <div class="creazione-card" data-materiali="granato" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/G2fdb2yz/Chat-GPT-Image-13-lug-2025-10-32-30.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Custode</h3>
+                            <p class="creazione-desc">Custode è un albero che non parla a tutti.
+    Le sue gemme rosse sono piene, mature, come frutti o gocce di sangue antico. Ma basta girargli intorno per scoprire il vero cuore: un piccolo totem nascosto, una scala di sette pietre che scendono nel tronco come se portassero un messaggio.
+    Cosa protegge? Nessuno lo sa. Ma si capisce subito che non è un albero qualsiasi.</p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Granato rosso<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Bacca d'Oro  -->
+                    <div class="creazione-card" data-materiali="agata-corniola" data-base="quarzo-grezzo">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/WpDJgqXN/Chat-GPT-Image-13-lug-2025-10-32-39.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Bacca d'Oro</h3>
+                            <p class="creazione-desc">Non ha bisogno di presentazioni.
+    Bacca d'Oro è un albero che si prende il centro. Le sue gemme rosse sembrano mirtilli maturi, ciliegie lucide, piccoli frutti pronti a essere colti. Ma non lo sono.
+    Stanno lì per farsi guardare.
+    Sotto, una pietra chiara con venature dorate che sembra dire: "questo è il mio terreno". Nessuna poesia, solo presenza.</p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Agata corniola<br>
+                                <strong>Base:</strong> Quarzo grezzo
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Neve  -->
+                    <div class="creazione-card" data-materiali="quarzo-bianco" data-base="ametista">
+                        <div class="creazione-image">
+                            <img src="https://i.postimg.cc/kXK6hr0L/Chat-GPT-Image-13-lug-2025-11-09-12.png" alt="">
+                        </div>
+                        <div class="creazione-content">
+                            <h3 class="creazione-name">Neve</h3>
+                            <p class="creazione-desc">Neve non cresce. Cade.
+    Non si espande: atterra. È un albero immobile solo in apparenza. Ogni foglia è un istante in bilico, ogni ramo una traiettoria lieve. Sta in equilibrio tra visibile e invisibile, come le prime nevicate leggere sui campi scuri.
+    Chi lo guarda sente silenzio. Ma anche attesa.</p>
+                            <p class="creazione-materials">
+                                <strong>Materiali:</strong> Quarzo bianco<br>
+                                <strong>Base:</strong> Ametista
+                            </p>
+                        </div>
+                    </div>
+
+                
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- Sezione Artigiano -->
+        <section class="artigiano">
+            <div class="container">
+                <h2 class="section-title">L'Artigiano</h2>
+                <div class="artigiano-content">
+                    <div class="artigiano-image">
+                        <div class="artigiano-photo">
+                            <img src="https://i.postimg.cc/brrV4x4y/MICHELE-BN.jpg" alt="Maestro artigiano al lavoro">
+                        </div>
+                    </div>
+                    <div class="artigiano-text">
+                        <h3 class="artigiano-name">Michele Pietro Lacagnina</h3>
+                        <p class="artigiano-subtitle">Custode di Equilibri Minerali</p>
                         
-                        <p>
-                            Dopo anni dedicati alla gemmologia e alla cristalloterapia, Marco ha sviluppato una sensibilità unica nel riconoscere le affinità tra i cristalli e nell'intuire le forme nascoste nella materia grezza. Le sue mani, rese sapienti da migliaia di ore passate tra fili metallici e pietre preziose, sanno modellare il tempo stesso in equilibri sospesi tra terra e cielo.
-                        </p>
-                        
-                        <p>
-                            Ogni albero nasce da una meditazione lunga mesi. Marco studia le pietre, le tiene tra le mani, le osserva in controluce fino a quando non emerge la forma perfetta. Non esiste fretta nel suo laboratorio, solo la pazienza millenaria che i cristalli portano dentro di sé e che lui ha imparato a riconoscere come la più alta forma di saggezza artistica.
-                        </p>
+                        <div class="artigiano-bio">
+                            <p>
+                                Marco non è nato artigiano. È diventato ascoltatore di pietre. Cresciuto tra le colline umbre, dove il silenzio ha il peso giusto e la luce sa posarsi senza fretta, ha imparato presto che ogni materiale ha una voce propria. L'ametista sussurra, l'agata racconta, il quarzo canta sottovoce.
+                            </p>
+                            
+                            <div class="artigiano-quote">
+                                "Non costruisco alberi. Li libero. Ogni pietra sa già dove vuole andare. Io sono solo quello che ascolta e segue il suo consiglio."
+                            </div>
+                            
+                            <p>
+                                Dopo anni dedicati alla gemmologia e alla cristalloterapia, Marco ha sviluppato una sensibilità unica nel riconoscere le affinità tra i cristalli e nell'intuire le forme nascoste nella materia grezza. Le sue mani, rese sapienti da migliaia di ore passate tra fili metallici e pietre preziose, sanno modellare il tempo stesso in equilibri sospesi tra terra e cielo.
+                            </p>
+                            
+                            <p>
+                                Ogni albero nasce da una meditazione lunga mesi. Marco studia le pietre, le tiene tra le mani, le osserva in controluce fino a quando non emerge la forma perfetta. Non esiste fretta nel suo laboratorio, solo la pazienza millenaria che i cristalli portano dentro di sé e che lui ha imparato a riconoscere come la più alta forma di saggezza artistica.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Sezione Ispirazione -->
-    <section class="ispirazione">
-        <div class="container">
-            <div class="ispirazione-grid">
-                <div class="ispirazione-block">
-                    <h3>Il Linguaggio delle Stagioni</h3>
-                    <p>Come gli antichi maestri giapponesi che celebravano il Momijigari – la contemplazione delle foglie d'autunno – ogni nostra creazione cattura un momento preciso del ciclo naturale. L'agata corniola sussurra di foglie che cadono, il quarzo verde canta la promessa della primavera, mentre l'ametista conserva il silenzio cristallino dell'inverno. Attraverso il filo dorato che si intreccia come il tempo stesso, ogni albero diventa un haiku tridimensionale.</p>
-                </div>
-                <div class="ispirazione-block">
-                    <h3>Geologia dell'Anima</h3>
-                    <p>Le pietre che scegliamo non sono casuali. Sono frammenti di storia planetaria, cristallizzazioni di forze primordiali. L'ametista, nata nel cuore della terra, porta con sé la saggezza del silenzio. L'agata racconta storie di trasformazione lenta e paziente. Il quarzo rosa vibra di compassione universale. Quando intrecciamo il filo metallico attorno a queste gemme, non stiamo solo creando arte: stiamo tessendo un dialogo tra la mano umana e la memoria minerale del mondo.</p>
-                </div>
-                <div class="ispirazione-block">
-                    <h3>Biomi dell'Immaginario</h3>
-                    <p>Dalla tundra silenziosa dove il vento scolpisce paesaggi essenziali, alla selva vibrante dove ogni foglia pulsa di vita segreta. Dai giardini zen dove ogni pietra è posizionata secondo una geometria sacra, alle lagune dove l'acqua conserva i riflessi della luna. I nostri alberi sono cartografie emotive di questi luoghi-archetipi. Chi li contempla non vede solo un oggetto decorativo, ma intraprende un viaggio verso paesaggi interiori inesplorati.</p>
+        </section>
+        
+        <!-- Sezione Ispirazione -->
+        <section class="ispirazione">
+            <div class="container">
+                <div class="ispirazione-grid">
+                    <div class="ispirazione-block">
+                        <h3>Il Linguaggio delle Stagioni</h3>
+                        <p>Come gli antichi maestri giapponesi che celebravano il Momijigari – la contemplazione delle foglie d'autunno – ogni nostra creazione cattura un momento preciso del ciclo naturale. L'agata corniola sussurra di foglie che cadono, il quarzo verde canta la promessa della primavera, mentre l'ametista conserva il silenzio cristallino dell'inverno. Attraverso il filo dorato che si intreccia come il tempo stesso, ogni albero diventa un haiku tridimensionale.</p>
+                    </div>
+                    <div class="ispirazione-block">
+                        <h3>Geologia dell'Anima</h3>
+                        <p>Le pietre che scegliamo non sono casuali. Sono frammenti di storia planetaria, cristallizzazioni di forze primordiali. L'ametista, nata nel cuore della terra, porta con sé la saggezza del silenzio. L'agata racconta storie di trasformazione lenta e paziente. Il quarzo rosa vibra di compassione universale. Quando intrecciamo il filo metallico attorno a queste gemme, non stiamo solo creando arte: stiamo tessendo un dialogo tra la mano umana e la memoria minerale del mondo.</p>
+                    </div>
+                    <div class="ispirazione-block">
+                        <h3>Biomi dell'Immaginario</h3>
+                        <p>Dalla tundra silenziosa dove il vento scolpisce paesaggi essenziali, alla selva vibrante dove ogni foglia pulsa di vita segreta. Dai giardini zen dove ogni pietra è posizionata secondo una geometria sacra, alle lagune dove l'acqua conserva i riflessi della luna. I nostri alberi sono cartografie emotive di questi luoghi-archetipi. Chi li contempla non vede solo un oggetto decorativo, ma intraprende un viaggio verso paesaggi interiori inesplorati.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    
-    <!-- Sezione Contatti -->
-    <section class="contatti">
-        <div class="container">
-            <h2 class="section-title">Contattaci</h2>
-            <form class="contact-form" action="#" method="POST">
-                <div class="form-group">
-                    <label for="name">Il tuo nome</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">La tua email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Il tuo messaggio</label>
-                    <textarea id="message" name="message" required placeholder="Raccontaci della tua visione..."></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Invia Messaggio</button>
-            </form>
-        </div>
-    </section>
-    
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p class="footer-quote">"Ogni albero ha una storia da raccontare"</p>
-            <div class="social-links">
-                <a href="#">Instagram</a>
-                <a href="#">Pinterest</a>
-                <a href="#">Etsy</a>
+        </section>
+        
+        
+        <!-- Sezione Contatti -->
+        <section class="contatti">
+            <div class="container">
+                <h2 class="section-title">Contattaci</h2>
+                <form class="contact-form" action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name">Il tuo nome</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">La tua email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Il tuo messaggio</label>
+                        <textarea id="message" name="message" required placeholder="Raccontaci della tua visione..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Invia Messaggio</button>
+                </form>
             </div>
-        </div>
-    </footer>
-    
-    <script>
-        // Sistema di Filtri Avanzato
-        function applicaFiltri() {
-            const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]:checked');
-            const filtriMateriali = [];
-            const filtriBase = [];
-            
-            checkboxes.forEach(cb => {
-                const material = cb.getAttribute('data-material');
-                const type = cb.getAttribute('data-type');
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p class="footer-quote">"Ogni albero ha una storia da raccontare"</p>
+                <div class="social-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">Pinterest</a>
+                    <a href="#">Etsy</a>
+                </div>
+            </div>
+        </footer>
+        
+        <script>
+            // Variabile per tracciare lo stato dei filtri
+            let filtriVisibili = false;
+
+            // Funzione per toggleare la visibilità dei filtri
+            function toggleFiltri() {
+                const container = document.getElementById('filtri-container');
+                const button = document.querySelector('.btn-filtri-toggle');
+                const icon = button.querySelector('.icon');
+                const text = button.querySelector('.text');
                 
-                if (type === 'materiali') {
-                    filtriMateriali.push(material);
-                } else if (type === 'base') {
-                    filtriBase.push(material);
-                }
-            });
-            
-            const cards = document.querySelectorAll('.creazione-card');
-            const risultatiInfo = document.getElementById('risultati-info');
-            let cardsVisibili = 0;
-            
-            cards.forEach(card => {
-                const materialiCard = card.getAttribute('data-materiali');
-                const baseCard = card.getAttribute('data-base');
+                filtriVisibili = !filtriVisibili;
                 
-                let mostraCard = true;
-                
-                // Se ci sono filtri per materiali, verifica corrispondenza
-                if (filtriMateriali.length > 0) {
-                    const materialiMatch = filtriMateriali.some(filtro => materialiCard.includes(filtro));
-                    if (!materialiMatch) {
-                        mostraCard = false;
-                    }
-                }
-                
-                // Se ci sono filtri per base, verifica corrispondenza
-                if (filtriBase.length > 0) {
-                    const baseMatch = filtriBase.some(filtro => baseCard.includes(filtro));
-                    if (!baseMatch) {
-                        mostraCard = false;
-                    }
-                }
-                
-                // Se non ci sono filtri, mostra tutto
-                if (filtriMateriali.length === 0 && filtriBase.length === 0) {
-                    mostraCard = true;
-                }
-                
-                if (mostraCard) {
-                    card.classList.remove('hidden');
-                    cardsVisibili++;
+                if (filtriVisibili) {
+                    container.classList.add('visible');
+                    button.classList.add('active');
+                    text.textContent = 'Nascondi Filtri';
                 } else {
-                    card.classList.add('hidden');
+                    container.classList.remove('visible');
+                    button.classList.remove('active');
+                    text.textContent = 'Filtra le Creazioni';
                 }
+            }
+
+            // Sistema di Filtri Avanzato
+            function applicaFiltri() {
+                const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]:checked');
+                const filtriMateriali = [];
+                const filtriBase = [];
+                
+                checkboxes.forEach(cb => {
+                    const material = cb.getAttribute('data-material');
+                    const type = cb.getAttribute('data-type');
+                    
+                    if (type === 'materiali') {
+                        filtriMateriali.push(material);
+                    } else if (type === 'base') {
+                        filtriBase.push(material);
+                    }
+                });
+
+                
+                
+                const cards = document.querySelectorAll('.creazione-card');
+                const risultatiInfo = document.getElementById('risultati-info');
+                let cardsVisibili = 0;
+                
+                cards.forEach(card => {
+                    const materialiCard = card.getAttribute('data-materiali');
+                    const baseCard = card.getAttribute('data-base');
+                    
+                    let mostraCard = true;
+                    
+                    // Se ci sono filtri per materiali, verifica corrispondenza
+                    if (filtriMateriali.length > 0) {
+                        const materialiMatch = filtriMateriali.some(filtro => materialiCard.includes(filtro));
+                        if (!materialiMatch) {
+                            mostraCard = false;
+                        }
+                    }
+                    
+                    // Se ci sono filtri per base, verifica corrispondenza
+                    if (filtriBase.length > 0) {
+                        const baseMatch = filtriBase.some(filtro => baseCard.includes(filtro));
+                        if (!baseMatch) {
+                            mostraCard = false;
+                        }
+                    }
+                    
+                    // Se non ci sono filtri, mostra tutto
+                    if (filtriMateriali.length === 0 && filtriBase.length === 0) {
+                        mostraCard = true;
+                    }
+                    
+                    if (mostraCard) {
+                        card.classList.remove('hidden');
+                        cardsVisibili++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+                
+                // Aggiorna info risultati
+                if (filtriMateriali.length === 0 && filtriBase.length === 0) {
+                    risultatiInfo.textContent = `Tutte le creazioni (${cardsVisibili} alberi)`;
+                    risultatiInfo.classList.remove('filtrato');
+                } else {
+                    let filtriAttivi = [];
+                    if (filtriMateriali.length > 0) {
+                        filtriAttivi.push(`${filtriMateriali.length} materiali foglie`);
+                    }
+                    if (filtriBase.length > 0) {
+                        filtriAttivi.push(`${filtriBase.length} materiali base`);
+                    }
+                    
+                    risultatiInfo.textContent = `${cardsVisibili} alberi con ${filtriAttivi.join(' e ')}`;
+                    risultatiInfo.classList.add('filtrato');
+                }
+            }
+            
+            function resetFiltri() {
+                const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+                applicaFiltri();
+            }
+            
+            function mostraTutti() {
+                resetFiltri();
+            }
+            
+            // Event listeners per i filtri
+            document.addEventListener('DOMContentLoaded', function() {
+                const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', applicaFiltri);
+                });
+
+                // Rendi cliccabile tutto il div filtro-item
+                const filtroItems = document.querySelectorAll('.filtro-item');
+                filtroItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        // Se il click è direttamente sulla checkbox, lascia che funzioni normalmente
+                        if (e.target.type === 'checkbox') {
+                            return;
+                        }
+                        
+                        // Per tutti gli altri elementi (immagine, label, div), attiva/disattiva la checkbox
+                        e.preventDefault();
+                        const checkbox = item.querySelector('input[type="checkbox"]');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            applicaFiltri();
+                        }
+                    });
+                });
             });
             
-            // Aggiorna info risultati
-            if (filtriMateriali.length === 0 && filtriBase.length === 0) {
-                risultatiInfo.textContent = `Tutte le creazioni (${cardsVisibili} alberi)`;
-                risultatiInfo.classList.remove('filtrato');
-            } else {
-                let filtriAttivi = [];
-                if (filtriMateriali.length > 0) {
-                    filtriAttivi.push(`${filtriMateriali.length} materiali foglie`);
-                }
-                if (filtriBase.length > 0) {
-                    filtriAttivi.push(`${filtriBase.length} materiali base`);
-                }
-                
-                risultatiInfo.textContent = `${cardsVisibili} alberi con ${filtriAttivi.join(' e ')}`;
-                risultatiInfo.classList.add('filtrato');
-            }
-        }
-        
-        function resetFiltri() {
-            const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = false);
-            applicaFiltri();
-        }
-        
-        function mostraTutti() {
-            resetFiltri();
-        }
-        
-        // Event listeners per i filtri
-        document.addEventListener('DOMContentLoaded', function() {
-            const checkboxes = document.querySelectorAll('.filtro-item input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', applicaFiltri);
+            // Form submission
+            document.querySelector('.contact-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Grazie per il tuo messaggio! Ti risponderemo presto.');
+                e.target.reset();
             });
-        });
-        
-        // Form submission
-        document.querySelector('.contact-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Grazie per il tuo messaggio! Ti risponderemo presto.');
-            e.target.reset();
-        });
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>

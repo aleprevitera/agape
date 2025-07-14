@@ -6,7 +6,7 @@
     "    <div class=\"creazione-image\">",
     "        <img src=\"${1:IMMAGINE}\" alt=\"\">",
     "    </div>",
-    "    <div class=\"creazione-content\">",
+    "    <div class=\"creazione-content\" data-materiali=\"FOGLIE\" data-base=\"BASE\">",
     "        <h3 class=\"creazione-name\">${2:NOME}</h3>",
     "        <p class=\"creazione-desc\">${3:DESCRIZIONE}</p>",
     "        <p class=\"creazione-materials\">",
