@@ -136,42 +136,62 @@
             font-family: 'Playfair Display', serif;
         }
 
-        .filtri-sezioni {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+        .filtri-sezione-unica {
             margin-bottom: 2rem;
         }
 
-        .filtri-sezione {
-            background: #fff;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        .filtri-sezione-titolo {
+            margin: 2.5rem 0 1.5rem 0;
+            padding: 1rem 0;
+            border-bottom: 2px solid var(--color-oro);
+            position: relative;
         }
 
-        .filtri-sezione-title {
+        .filtri-sezione-titolo:first-child {
+            margin-top: 0;
+        }
+
+        .filtri-sezione-titolo h4 {
             text-align: center;
             font-size: 1.4rem;
-            color: var(--color-ametista);
-            margin-bottom: 1.5rem;
+            color: var(--color-oro);
             font-family: 'Playfair Display', serif;
-            border-bottom: 2px solid var(--color-sabbia);
-            padding-bottom: 0.5rem;
+            margin: 0;
+            padding: 0 1rem;
+            background: var(--color-crema);
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .filtri-sezione-titolo::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--color-oro);
+            z-index: 0;
+            opacity: 0.3;
         }
 
         .filtri-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .filtro-gruppo {
-            background: var(--color-crema);
+            background: #fff;
             border-radius: 12px;
-            padding: 1rem;
-            border: 2px solid transparent;
+            padding: 1.5rem;
+            border: 2px solid var(--color-sabbia);
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .filtro-gruppo:hover {
@@ -183,36 +203,49 @@
         .filtro-categoria {
             font-weight: bold;
             color: var(--color-ametista);
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
             text-align: center;
             font-family: 'Playfair Display', serif;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border-bottom: 1px solid var(--color-sabbia);
+            padding-bottom: 0.5rem;
         }
 
         .filtro-item {
             display: flex;
             align-items: center;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            padding: 0.5rem;
+            padding: 0.8rem;
             border-radius: 8px;
+            background: rgba(245, 242, 234, 0.5);
+        }
+
+        .filtro-item:last-child {
+            margin-bottom: 0;
         }
 
         .filtro-item:hover {
-            background: rgba(193, 154, 107, 0.1);
+            background: rgba(193, 154, 107, 0.15);
         }
 
         .filtro-item input[type="checkbox"] {
             margin-right: 0.8rem;
             cursor: pointer;
-            transform: scale(1.1);
+            transform: scale(1.2);
             accent-color: var(--color-oro);
         }
 
         .material-image {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             margin-right: 0.8rem;
             border: 2px solid var(--color-sabbia);
@@ -227,7 +260,7 @@
         .filtro-item label {
             cursor: pointer;
             flex: 1;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--color-testo-light);
             transition: color 0.3s ease;
             font-weight: 400;
@@ -674,16 +707,16 @@
                 height: 250px;
             }
 
-            .filtri-sezioni {
-                grid-template-columns: 1fr;
-            }
-
             .filtri-grid {
                 grid-template-columns: 1fr;
             }
 
             .filtri-azioni {
                 flex-direction: column;
+            }
+
+            .filtri-sezione-titolo h4 {
+                font-size: 1.2rem;
             }
             
             .creazioni-grid,
@@ -736,110 +769,107 @@
             <div class="filtri-container">
                 <h3 class="filtri-title">Esplora per Materiali</h3>
                 
-                <div class="filtri-sezioni">
-                    <!-- Filtri Materiali Foglie -->
-                    <div class="filtri-sezione">
-                        <h4 class="filtri-sezione-title">Materiali delle Foglie</h4>
-                        <div class="filtri-grid">
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Quarzi</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Quarzo Bianco" class="material-image">
-                                    <label for="m-quarzo-bianco">Quarzo Bianco</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
-                                    <label for="m-quarzo-rosa">Quarzo Rosa</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
-                                    <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
-                                </div>
+                <div class="filtri-sezione-unica">
+                    <!-- Materiali delle Foglie -->
+                    <div class="filtri-sezione-titolo">
+                        <h4>Materiali delle Foglie</h4>
+                    </div>
+                    
+                    <div class="filtri-grid">
+                        <div class="filtro-gruppo">
+                            <div class="filtro-categoria">Quarzi</div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-quarzo-bianco" data-material="quarzo-bianco" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Quarzo Bianco" class="material-image">
+                                <label for="m-quarzo-bianco">Quarzo Bianco</label>
                             </div>
-                            
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Agate</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-agata-corniola" data-material="agata-corniola" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1569838275086-4e71b1b4a6c7?w=100&h=100&fit=crop&crop=center" alt="Agata Corniola" class="material-image">
-                                    <label for="m-agata-corniola">Agata Corniola</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-agata-verde" data-material="agata-verde" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1583486937959-0c6a5f6d7c6c?w=100&h=100&fit=crop&crop=center" alt="Agata Verde" class="material-image">
-                                    <label for="m-agata-verde">Agata Verde</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-agata-blu" data-material="agata-blu" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=100&h=100&fit=crop&crop=center" alt="Agata Blu" class="material-image">
-                                    <label for="m-agata-blu">Agata Blu</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-agata-rossa" data-material="agata-rossa" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1509368863317-dddadc1ad69f?w=100&h=100&fit=crop&crop=center" alt="Agata Rossa" class="material-image">
-                                    <label for="m-agata-rossa">Agata Rossa</label>
-                                </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-quarzo-rosa" data-material="quarzo-rosa" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=100&fit=crop&crop=center" alt="Quarzo Rosa" class="material-image">
+                                <label for="m-quarzo-rosa">Quarzo Rosa</label>
                             </div>
-                            
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Altri Minerali</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-labradorite" data-material="labradorite" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1599582909646-e8e1c2e3c7b4?w=100&h=100&fit=crop&crop=center" alt="Labradorite" class="material-image">
-                                    <label for="m-labradorite">Labradorite</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-granato" data-material="granato" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=100&h=100&fit=crop&crop=center" alt="Granato" class="material-image">
-                                    <label for="m-granato">Granato</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="m-olivina" data-material="olivina" data-type="materiali">
-                                    <img src="https://images.unsplash.com/photo-1605967230828-a5c8e4e6e5c2?w=100&h=100&fit=crop&crop=center" alt="Olivina" class="material-image">
-                                    <label for="m-olivina">Olivina</label>
-                                </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-quarzo-grezzo" data-material="quarzo-grezzo" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
+                                <label for="m-quarzo-grezzo">Quarzo Grezzo</label>
+                            </div>
+                        </div>
+                        
+                        <div class="filtro-gruppo">
+                            <div class="filtro-categoria">Agate</div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-agata-corniola" data-material="agata-corniola" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1569838275086-4e71b1b4a6c7?w=100&h=100&fit=crop&crop=center" alt="Agata Corniola" class="material-image">
+                                <label for="m-agata-corniola">Agata Corniola</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-agata-verde" data-material="agata-verde" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1583486937959-0c6a5f6d7c6c?w=100&h=100&fit=crop&crop=center" alt="Agata Verde" class="material-image">
+                                <label for="m-agata-verde">Agata Verde</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-agata-blu" data-material="agata-blu" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1570222094114-d054a817e56b?w=100&h=100&fit=crop&crop=center" alt="Agata Blu" class="material-image">
+                                <label for="m-agata-blu">Agata Blu</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-agata-rossa" data-material="agata-rossa" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1509368863317-dddadc1ad69f?w=100&h=100&fit=crop&crop=center" alt="Agata Rossa" class="material-image">
+                                <label for="m-agata-rossa">Agata Rossa</label>
+                            </div>
+                        </div>
+                        
+                        <div class="filtro-gruppo">
+                            <div class="filtro-categoria">Altri Minerali</div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-labradorite" data-material="labradorite" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1599582909646-e8e1c2e3c7b4?w=100&h=100&fit=crop&crop=center" alt="Labradorite" class="material-image">
+                                <label for="m-labradorite">Labradorite</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-granato" data-material="granato" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=100&h=100&fit=crop&crop=center" alt="Granato" class="material-image">
+                                <label for="m-granato">Granato</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="m-olivina" data-material="olivina" data-type="materiali">
+                                <img src="https://images.unsplash.com/photo-1605967230828-a5c8e4e6e5c2?w=100&h=100&fit=crop&crop=center" alt="Olivina" class="material-image">
+                                <label for="m-olivina">Olivina</label>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Filtri Materiali Base -->
-                    <div class="filtri-sezione">
-                        <h4 class="filtri-sezione-title">Materiali della Base</h4>
-                        <div class="filtri-grid">
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Ametiste</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="b-ametista" data-material="ametista" data-type="base">
-                                    <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Ametista" class="material-image">
-                                    <label for="b-ametista">Ametista</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="b-ametista-lavanda" data-material="ametista-lavanda" data-type="base">
-                                    <img src="https://images.unsplash.com/photo-1617791160588-241658c0f566?w=100&h=100&fit=crop&crop=center" alt="Ametista Lavanda" class="material-image">
-                                    <label for="b-ametista-lavanda">Ametista Lavanda</label>
-                                </div>
+                    <!-- Materiali della Base -->
+                    <div class="filtri-sezione-titolo">
+                        <h4>Materiali della Base</h4>
+                    </div>
+                    
+                    <div class="filtri-grid">
+                        <div class="filtro-gruppo">
+                            <div class="filtro-categoria">Ametiste</div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="b-ametista" data-material="ametista" data-type="base">
+                                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2ac0?w=100&h=100&fit=crop&crop=center" alt="Ametista" class="material-image">
+                                <label for="b-ametista">Ametista</label>
                             </div>
-                            
-                            <div class="filtro-gruppo">
-                                <div class="filtro-categoria">Pietre Naturali</div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="b-pietra-calcarea" data-material="pietra-calcarea" data-type="base">
-                                    <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=100&h=100&fit=crop&crop=center" alt="Pietra Calcarea" class="material-image">
-                                    <label for="b-pietra-calcarea">Pietra Calcarea</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="b-marmo" data-material="marmo" data-type="base">
-                                    <img src="https://images.unsplash.com/photo-1509909756405-be0199881695?w=100&h=100&fit=crop&crop=center" alt="Marmo" class="material-image">
-                                    <label for="b-marmo">Marmo</label>
-                                </div>
-                                <div class="filtro-item">
-                                    <input type="checkbox" id="b-quarzo-grezzo" data-material="quarzo-grezzo" data-type="base">
-                                    <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
-                                    <label for="b-quarzo-grezzo">Quarzo Grezzo</label>
-                                </div>
+                        </div>
+                        
+                        <div class="filtro-gruppo">
+                            <div class="filtro-categoria">Pietre Naturali</div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="b-pietra-calcarea" data-material="pietra-calcarea" data-type="base">
+                                <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=100&h=100&fit=crop&crop=center" alt="Pietra Calcarea" class="material-image">
+                                <label for="b-pietra-calcarea">Pietra Calcarea</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="b-marmo" data-material="marmo" data-type="base">
+                                <img src="https://images.unsplash.com/photo-1509909756405-be0199881695?w=100&h=100&fit=crop&crop=center" alt="Marmo" class="material-image">
+                                <label for="b-marmo">Marmo</label>
+                            </div>
+                            <div class="filtro-item">
+                                <input type="checkbox" id="b-quarzo-grezzo" data-material="quarzo-grezzo" data-type="base">
+                                <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=100&h=100&fit=crop&crop=center" alt="Quarzo Grezzo" class="material-image">
+                                <label for="b-quarzo-grezzo">Quarzo Grezzo</label>
                             </div>
                         </div>
                     </div>
