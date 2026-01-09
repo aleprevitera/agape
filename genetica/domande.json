@@ -1,0 +1,957 @@
+[
+  {
+    "domanda": "In che percentuale è possibile identificare l'eziologia del ritardo mentale?",
+    "risposte": ["70%", "50%", "90%", "30%"],
+    "risposta_corretta": "70%"
+  },
+  {
+    "domanda": "Com'è definita la disabilità intellettiva?",
+    "risposte": [
+      "Patologia che compromette contemporaneamente sia il funzionamento intellettivo sia il comportamento adattativo",
+      "Patologia che compromette esclusivamente il funzionamento intellettivo",
+      "Patologia che compromette esclusivamente il comportamento adattativo",
+      "Patologia caratterizzata da QI inferiore a 70"
+    ],
+    "risposta_corretta": "Patologia che compromette contemporaneamente sia il funzionamento intellettivo sia il comportamento adattativo"
+  },
+  {
+    "domanda": "Che tipo di alterazione cromosomica si ha nella sindrome di Down?",
+    "risposte": ["Aneuploidia", "Poliploidia", "Delezione", "Traslocazione bilanciata"],
+    "risposta_corretta": "Aneuploidia"
+  },
+  {
+    "domanda": "Una delezione cromosomica di 8Mb può essere documentata con:",
+    "risposte": [
+      "Esame del cariotipo",
+      "FISH o array CGH",
+      "Ecografia fetale del II trimestre",
+      "Sequenziamento dei geni coinvolti nella delezione"
+    ],
+    "risposta_corretta": "FISH o array CGH"
+  },
+  {
+    "domanda": "Nel test genetico la consulenza pre-test è:",
+    "risposte": [
+      "Necessaria",
+      "Opzionale",
+      "Necessaria solo se c'è storia familiare positiva per malattie genetiche",
+      "Dipende dalla patologia in esame"
+    ],
+    "risposta_corretta": "Necessaria"
+  },
+  {
+    "domanda": "La penetranza di una mutazione autosomica dominante diagnosticata attraverso una diagnosi prenatale:",
+    "risposte": [
+      "Non è mai prevedibile",
+      "È prevedibile solo in alcune patologie",
+      "È sempre prevedibile se ci sono più individui affetti nella famiglia",
+      "È sempre prevedibile"
+    ],
+    "risposta_corretta": "È prevedibile solo in alcune patologie"
+  },
+  {
+    "domanda": "Quale di queste patologie a trasmissione dominante non ha penetranza ridotta/espressione variabile del fenotipo:",
+    "risposte": [
+      "La distonia primaria da mutazione del gene DYT1",
+      "La malattia di Parkinson da mutazione del gene SNCA",
+      "L'acondroplasia da mutazione del gene FGFR3",
+      "Tutte le precedenti hanno penetranza ridotta"
+    ],
+    "risposta_corretta": "L'acondroplasia da mutazione del gene FGFR3"
+  },
+  {
+    "domanda": "Nelle malattie da mutazione dinamiche, le premutazioni:",
+    "risposte": [
+      "Portano a un rischio aumentato di avere figli affetti",
+      "Possono causare il fenotipo con penetranza ridotta",
+      "Possono causare fenotipi diversi dalle espansioni complete",
+      "Tutte le risposte sono corrette"
+    ],
+    "risposta_corretta": "Tutte le risposte sono corrette"
+  },
+  {
+    "domanda": "Una variante viene definita patologica solo se:",
+    "risposte": [
+      "Tutti i programmi di predizione bioinformatica sono concordanti nel definirla patogenetica",
+      "Si può confermare la segregazione con la malattia nel nucleo familiare",
+      "Sono rispettati i criteri minimi secondo le linee guida dell'American College of Medical Genetics and Genomics",
+      "Non è mai stata riscontrata in soggetto sano"
+    ],
+    "risposta_corretta": "Sono rispettati i criteri minimi secondo le linee guida dell'American College of Medical Genetics and Genomics"
+  },
+  {
+    "domanda": "Il database di popolazione più comunemente utilizzato è:",
+    "risposte": ["Ensembl", "NCBI", "gnomAD", "ClinVar"],
+    "risposta_corretta": "gnomAD"
+  },
+  {
+    "domanda": "La consulenza genetica di una malattia a trasmissione autosomica dominante è spesso complicata da:",
+    "risposte": [
+      "Penetranza ridotta",
+      "Espressione variabile del fenotipo",
+      "Entrambe le precedenti",
+      "Nessuna delle precedenti"
+    ],
+    "risposta_corretta": "Entrambe le precedenti"
+  },
+  {
+    "domanda": "Le portatrici femmine di una premutazione del gene FMR1 sono principalmente a rischio per:",
+    "risposte": [
+      "Sindrome FXTAS ad esordio tardivo",
+      "Premature ovarian failure",
+      "Figlie femmine affette da sindrome dell'X fragile",
+      "Tutte le precedenti"
+    ],
+    "risposta_corretta": "Premature ovarian failure"
+  },
+  {
+    "domanda": "Un test genico predittivo:",
+    "risposte": [
+      "Se positivo permetterà, sapendo che la patologia si manifesterà con certezza, di intraprendere precocemente uno specifico trattamento medico e di considerare pari al 50% il rischio di malattia della prole",
+      "Se positivo permetterà di definire il rischio generico di una malattia, ma non di predire con esattezza se il soggetto svilupperà la patologia",
+      "Se positivo indica che il soggetto è portatore di una mutazione recessiva",
+      "Nessuna delle precedenti"
+    ],
+    "risposta_corretta": "Se positivo permetterà di definire il rischio generico di una malattia, ma non di predire con esattezza se il soggetto svilupperà la patologia"
+  },
+  {
+    "domanda": "Quali sono le tecniche di next generation sequencing più comunemente utilizzate nella pratica clinica?",
+    "risposte": [
+      "Sequenziamento di pannelli di geni specifici",
+      "Sequenziamento dell'esoma clinico",
+      "Sequenziamento dell'esoma e analisi di pannelli virtuali",
+      "Tutte le precedenti"
+    ],
+    "risposta_corretta": "Tutte le precedenti"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni su Whole Exome Sequencing è vera:",
+    "risposte": [
+      "Può analizzare simultaneamente le regioni codificanti dei nostri geni",
+      "Ha un tasso di positività vicino al 90%",
+      "Può identificare mutazioni puntiformi, CNV e altre varianti cromosomiche strutturali",
+      "È applicabile solo in ricerca"
+    ],
+    "risposta_corretta": "Può analizzare simultaneamente le regioni codificanti dei nostri geni"
+  },
+  {
+    "domanda": "Il test genetico del portatore viene effettuato nel caso di:",
+    "risposte": [
+      "Malattie autosomiche recessive",
+      "Malattie autosomiche dominanti",
+      "Malattie mitocondriali",
+      "Malattie autosomiche e X linked recessive"
+    ],
+    "risposta_corretta": "Malattie autosomiche e X linked recessive"
+  },
+  {
+    "domanda": "Un bambino presenta difetti cardiaci congeniti, schisi palatina e ipoplasia timica (sindrome di DiGeorge). I genitori sono sani. Quale test genetico è indicato per la diagnosi?",
+    "risposte": [
+      "Analisi del cariotipo",
+      "Array CGH",
+      "Whole exome sequencing",
+      "Analisi del pannello di geni responsabili di difetti cardiaci"
+    ],
+    "risposta_corretta": "Array CGH"
+  },
+  {
+    "domanda": "Quale delle seguenti condizioni può essere associata a un fenotipo sindromico?",
+    "risposte": [
+      "Schizofrenia",
+      "Traslocazione bilanciata t(9;22)",
+      "Delezione 7q11.23",
+      "Ipercolesterolemia"
+    ],
+    "risposta_corretta": "Delezione 7q11.23"
+  },
+  {
+    "domanda": "Un bambino con una malattia autosomica dominante geneticamente eterogenea viene sottoposto a NGS per lo specifico pannello di geni, ma non vengono trovate mutazioni. La possibile causa è:",
+    "risposte": [
+      "La mutazione risiede in una regione non codificante di uno dei geni testati",
+      "La mutazione risiede in un gene non ancora associato con la malattia",
+      "La mutazione è una delezione multiesonica non rilevata dall'analisi NGS",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "Rispetto alla whole exome sequencing, la whole genome sequencing ha i seguenti vantaggi:",
+    "risposte": [
+      "Minor incidenza di riscontri incidentali",
+      "Identificazione di varianti splicing canoniche",
+      "Identificazione di traslocazioni cromosomiche bilanciate",
+      "Maggiore facilità dell'analisi bioinformatica dei dati e dell'interpretazione delle varianti"
+    ],
+    "risposta_corretta": "Identificazione di traslocazioni cromosomiche bilanciate"
+  },
+  {
+    "domanda": "I test genetici presintomatici vengono eseguiti su:",
+    "risposte": [
+      "Soggetti a rischio di sviluppare malattie multifattoriali",
+      "Soggetti a rischio di sviluppare malattie a trasmissione mendeliana con una penetranza completa età dipendente",
+      "Bambini a rischio di sviluppare malattia in tarda età",
+      "Soggetti affetti per confermare la diagnosi clinica"
+    ],
+    "risposta_corretta": "Soggetti a rischio di sviluppare malattie a trasmissione mendeliana con una penetranza completa età dipendente"
+  },
+  {
+    "domanda": "La diagnosi prenatale:",
+    "risposte": [
+      "Viene sempre eseguita se la madre ha più di 35 anni",
+      "È raccomandata se la coppia è portatrice di mutazioni genetiche note",
+      "Può identificare solo riarrangiamenti cromosomici non bilanciati",
+      "Viene eseguita dal secondo trimestre di gravidanza"
+    ],
+    "risposta_corretta": "È raccomandata se la coppia è portatrice di mutazioni genetiche note"
+  },
+  {
+    "domanda": "Le espansioni ripetute:",
+    "risposte": [
+      "Possono espandersi, rimanere stabili o ridursi di dimensioni durante la meiosi",
+      "Si espandono sempre durante la meiosi",
+      "Le espansioni più grandi si verificano nella meiosi paterna",
+      "Tutte le risposte sono false"
+    ],
+    "risposta_corretta": "Possono espandersi, rimanere stabili o ridursi di dimensioni durante la meiosi"
+  },
+  {
+    "domanda": "Una SNP dentro un esone:",
+    "risposte": [
+      "Può determinare la sostituzione di un aminoacido con un altro",
+      "Non risulta mai nella sostituzione di un aminoacido con un altro",
+      "Risulta sempre nella sostituzione di un aminoacido con un altro",
+      "È sempre benigna"
+    ],
+    "risposta_corretta": "Può determinare la sostituzione di un aminoacido con un altro"
+  },
+  {
+    "domanda": "Le copy number variants:",
+    "risposte": [
+      "Sono sempre evidenziate anche in soggetti sani",
+      "Sono sempre associate con un fenotipo sindromico",
+      "Sono sempre causa di malattie genetiche a penetranza completa",
+      "Sono sempre ereditate da un genitore sano"
+    ],
+    "risposta_corretta": "Sono sempre evidenziate anche in soggetti sani"
+  },
+  {
+    "domanda": "L'eredità pseudodominante può essere il risultato di:",
+    "risposte": [
+      "Fenocopie",
+      "Segregazione di più di due mutazioni nella famiglia",
+      "Consanguineità in generazioni consecutive",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "Quale tipo di eredità può essere sospettata in un albero genealogico con maschi affetti in più generazioni attraverso femmine portatrici?",
+    "risposte": [
+      "Autosomico dominante con penetranza ridotta",
+      "Autosomico recessivo",
+      "X linked recessivo",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "Che tipo di ereditarietà può essere sospettata in un albero genealogico dove la malattia si manifesta solo quando ereditata dal padre?",
+    "risposte": [
+      "Autosomica dominante con imprinting materno",
+      "Autosomica dominante con imprinting paterno",
+      "Multifattoriale",
+      "Tutte le risposte sono false"
+    ],
+    "risposta_corretta": "Autosomica dominante con imprinting materno"
+  },
+  {
+    "domanda": "La malattia di Huntington è un disordine autosomico dominante con penetranza completa dovuto all'espansione di triplette. I soggetti sani hanno dalle 6 alle 35 ripetizioni, mentre i pazienti hanno >40 ripetizioni CAG. Esamini un paziente di 60 anni che ha recentemente iniziato a presentare segni suggestivi di malattia di Huntington. L'anamnesi familiare è negativa. Qual è lo scenario più probabile?",
+    "risposte": [
+      "Il paziente è stato adottato",
+      "Il paziente ha un diverso disordine Huntington-like",
+      "Il paziente ha una malattia di Huntington ereditata da un genitore con 37 ripetizioni CAG",
+      "Il paziente ha una malattia di Huntington ereditata da un genitore con 34 ripetizioni CAG"
+    ],
+    "risposta_corretta": "Il paziente ha una malattia di Huntington ereditata da un genitore con 37 ripetizioni CAG"
+  },
+  {
+    "domanda": "Quale delle seguenti principalmente esclude la patogenicità di una variante?",
+    "risposte": [
+      "Mancanza di segregazione della variante con la malattia all'interno della famiglia",
+      "Predizione della variante come benigna dagli strumenti bioinformatici",
+      "Occorrenza della variante nel database di popolazione come gnomAD",
+      "Tutte le risposte sono false"
+    ],
+    "risposta_corretta": "Mancanza di segregazione della variante con la malattia all'interno della famiglia"
+  },
+  {
+    "domanda": "Quanti geni possono essere inclusi in un sequencing panel NGS-based?",
+    "risposte": [
+      "Fino a 10",
+      "Fino a 100",
+      "Fino a 1000",
+      "Non c'è un limite fisso"
+    ],
+    "risposta_corretta": "Non c'è un limite fisso"
+  },
+  {
+    "domanda": "La sensibilità del NGS per identificare mosaicismi di basso grado di certe varianti dipende da:",
+    "risposte": [
+      "Qualità dei reads",
+      "Coverage depth of the variant",
+      "Tipo di kit usato per preparare la sequencing library",
+      "NGS è sempre in grado di evidenziare mosaicismi di basso grado"
+    ],
+    "risposta_corretta": "Coverage depth of the variant"
+  },
+  {
+    "domanda": "Le varianti di significato sconosciuto (VUS):",
+    "risposte": [
+      "Sono solitamente benigne",
+      "Devono essere rivalutate nel tempo",
+      "Non sono mai incluse nei report diagnostici",
+      "Tutte le risposte sono false"
+    ],
+    "risposta_corretta": "Devono essere rivalutate nel tempo"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni riguardo le scoperte incidentali perseguibili dal punto di vista medico (actionable) è più accurata, a condizione che sia stato richiesto il consenso informato?",
+    "risposte": [
+      "Devono essere riportate in tutti i casi",
+      "Devono essere riportate solo nei bambini",
+      "Devono essere riportate solo negli adulti",
+      "Non devono mai essere riportate perché il test genetico è stato eseguito per una ragione differente"
+    ],
+    "risposta_corretta": "Devono essere riportate in tutti i casi"
+  },
+  {
+    "domanda": "Se cerchiamo nel database gnomAD il gene CFTR, causativo della fibrosi cistica:",
+    "risposte": [
+      "Avremo una lista di tutte le varianti identificate con sequenziamento di grandi coorti di pazienti con la malattia",
+      "Avremo una lista di tutte le varianti identificate con sequenziamento di grandi coorti di soggetti sani",
+      "Avremo la struttura del gene",
+      "Avremo una lista delle copy number variants evidenziate sia in soggetti sani sia in soggetti malati"
+    ],
+    "risposta_corretta": "Avremo una lista di tutte le varianti identificate con sequenziamento di grandi coorti di soggetti sani"
+  },
+  {
+    "domanda": "La leucemia mieloide cronica dovuta al cromosoma Philadelphia può essere trattata con:",
+    "risposte": [
+      "Terapia di inibizione allele specifica",
+      "Terapia di sostituzione genica",
+      "Terapia di aumento genico",
+      "Terapia mediata da CRISPR-Cas9"
+    ],
+    "risposta_corretta": "Terapia di inibizione allele specifica"
+  },
+  {
+    "domanda": "I nucleotidi antisenso sono fatti di:",
+    "risposte": [
+      "ssDNA",
+      "dsDNA",
+      "ssRNA",
+      "Acidi nucleici virali"
+    ],
+    "risposta_corretta": "ssDNA"
+  },
+  {
+    "domanda": "L'immunoterapia è usata principalmente per trattare:",
+    "risposte": [
+      "Malattie neurodegenerative",
+      "Cancro",
+      "Malattie metaboliche",
+      "Malattie immunologiche"
+    ],
+    "risposta_corretta": "Cancro"
+  },
+  {
+    "domanda": "Visiti un bambino di 3 anni con dismorfismi, lieve ipotonia, lieve disabilità intellettiva e decidi di fare un array CGH. L'analisi identifica: 1) Una delezione di 55 Kb in 17q21.31 contenente due geni, sovrapposta a delezioni in Decipher ma occasionalmente in DGV; 2) Una duplicazione di 304Kb in 9q21.12 senza geni OMIM. Qual è il passaggio successivo?",
+    "risposte": [
+      "Chiedere una WES",
+      "Chiedere un sequenziamento Sanger dei geni coinvolti per cercare seconde mutazioni",
+      "Chiedere analisi CNV dei genitori per vedere se le CNV sono ereditate o de novo",
+      "Dire ai genitori che il rischio di ricorrenza del fenotipo è trascurabile"
+    ],
+    "risposta_corretta": "Chiedere analisi CNV dei genitori per vedere se le CNV sono ereditate o de novo"
+  },
+  {
+    "domanda": "Visiti una bambina di 2 anni con sindrome di Joubert, malformazione cerebrale congenita ad ereditarietà recessiva con alta eterogeneità genetica. WES identifica due varianti tronche eterozigoti in CEP290. Qual è il passo successivo?",
+    "risposte": [
+      "Dire alla famiglia che le due mutazioni sono causative della malattia",
+      "Sequenziare i membri della famiglia disponibili per confermare la segregazione delle varianti",
+      "Sequenziare 100 controlli per escludere che queste varianti siano un polimorfismo comune",
+      "Eseguire WES nei genitori"
+    ],
+    "risposta_corretta": "Sequenziare i membri della famiglia disponibili per confermare la segregazione delle varianti"
+  },
+  {
+    "domanda": "Visiti un bambino di 5 anni con malattia di Niemann-Pick, disordine metabolico autosomico recessivo. NGS identifica una variante patogenetica in SMPD1 apparentemente omozigote. L'analisi di segregazione dimostra che solo la madre è portatrice eterozigote, mentre il padre è wild type. Come può essere spiegato?",
+    "risposte": [
+      "Isodisomia materna del cromosoma 11",
+      "Delezione eterozigote di SMPD1 nel padre",
+      "Non è il padre biologico",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "gnomAD e ESP sono esempi di:",
+    "risposte": [
+      "Database di mutazioni",
+      "Database di popolazione",
+      "Database di CNV",
+      "Database di espressione genica"
+    ],
+    "risposta_corretta": "Database di popolazione"
+  },
+  {
+    "domanda": "Una delezione cromosomica di 1.5Mb può essere individuata con:",
+    "risposte": [
+      "Analisi del cariotipo",
+      "FISH o CGH-array",
+      "In epoca prenatale con ecografia del II trimestre",
+      "Sequenziando il gene coinvolto nella delezione"
+    ],
+    "risposta_corretta": "FISH o CGH-array"
+  },
+  {
+    "domanda": "Il rischio di prole affetta da sindrome di Down da una madre portatrice di una traslocazione robertsoniana (21;21) è:",
+    "risposte": [
+      "Correlato con l'età della donna al momento del concepimento",
+      "100%",
+      "50%",
+      "Meno del 10%"
+    ],
+    "risposta_corretta": "100%"
+  },
+  {
+    "domanda": "La sindrome di DiGeorge, causata dalla microdelezione del chr.22q11, può essere diagnosticata con:",
+    "risposte": [
+      "Analisi del cariotipo",
+      "Sequenziamento del gene MECP2",
+      "FISH o CGH-array",
+      "WES"
+    ],
+    "risposta_corretta": "FISH o CGH-array"
+  },
+  {
+    "domanda": "Quale diagnosi è più probabile in un bambino di 4 anni che mostra severo ritardo dello sviluppo, assenza di linguaggio espressivo, microcefalia e atassia?",
+    "risposte": [
+      "Sindrome di Patau (trisomia 13)",
+      "Sindrome di Turner (monosomia X)",
+      "Sindrome di Angelman (delezione chr. 15q11.2-q13)",
+      "Corea di Huntington (espansione CAG nel gene HTT)"
+    ],
+    "risposta_corretta": "Sindrome di Angelman (delezione chr. 15q11.2-q13)"
+  },
+  {
+    "domanda": "La sindrome di Klinefelter viene diagnosticata principalmente:",
+    "risposte": [
+      "In diagnosi prenatale con analisi del cariotipo degli amniociti dopo riscontro ecografico di malformazioni fetali",
+      "Nel periodo neonatale a causa della presenza di pterigium colli, linfedema delle estremità e cardiopatia congenita",
+      "In età scolare a causa della valutazione di epilessia resistente ai farmaci",
+      "Nell'età adulta a causa di valutazioni per l'infertilità"
+    ],
+    "risposta_corretta": "Nell'età adulta a causa di valutazioni per l'infertilità"
+  },
+  {
+    "domanda": "Nel test genetico:",
+    "risposte": [
+      "La consulenza genetica pre-test è opzionale",
+      "Deve essere preceduto da informazioni dettagliate riguardo alla patologia di interesse in termini di pattern di trasmissione ereditaria, rischio di ricorrenza e possibili complicanze",
+      "È sempre necessaria la prescrizione del medico di base confermata dallo specialista",
+      "È sufficiente raccogliere il consenso informato"
+    ],
+    "risposta_corretta": "È sufficiente raccogliere il consenso informato"
+  },
+  {
+    "domanda": "I maschi portatori di premutazione nel gene FMR1 sono a rischio di:",
+    "risposte": [
+      "Sviluppo tardivo di FXTAS (sindrome tremore-atassia)",
+      "Infertilità dovuta a insufficienza gonadica",
+      "Avere figli maschi affetti dalla sindrome dell'X fragile",
+      "Tutte le precedenti"
+    ],
+    "risposta_corretta": "Sviluppo tardivo di FXTAS (sindrome tremore-atassia)"
+  },
+  {
+    "domanda": "Un uomo di 30 anni, sottoposto a riabilitazione per alcolismo, presenta movimenti mioclonici degli arti e distonia del tronco. È figlio di una coppia sana non consanguinea e la nonna materna presentava jerks mioclonici descritti come tic legati all'ansia. Quale indagine genetica dovrebbe essere richiesta?",
+    "risposte": [
+      "Pannello NGS per difetti dei geni coinvolti nel metabolismo dell'alcol",
+      "Array-CGH considerando l'anamnesi familiare positiva per ansia",
+      "Analisi molecolare del gene SGCE causativo di distonia mioclonica, sospettando una variante ereditata da un padre non penetrante (imprinting paterno)",
+      "Pannello NGS per malattia di Parkinson"
+    ],
+    "risposta_corretta": "Analisi molecolare del gene SGCE causativo di distonia mioclonica, sospettando una variante ereditata da un padre non penetrante (imprinting paterno)"
+  },
+  {
+    "domanda": "Un test genetico predittivo:",
+    "risposte": [
+      "Se positivo, sapendo che la malattia si manifesterà certamente, permette di iniziare un trattamento medico specifico e di considerare il rischio di 50% di prole affetta",
+      "Se positivo, permette di definire il rischio di una generica malattia ma non è in grado di predire esattamente se il soggetto svilupperà la malattia",
+      "Se positivo permette di confermare che il soggetto è un portatore sano eterozigote",
+      "Nessuna delle precedenti risposte è corretta"
+    ],
+    "risposta_corretta": "Se positivo, permette di definire il rischio di una generica malattia ma non è in grado di predire esattamente se il soggetto svilupperà la malattia"
+  },
+  {
+    "domanda": "Cosa limita l'utilizzo del WGS nella pratica clinica?",
+    "risposte": [
+      "Difficoltà a reperire reagenti",
+      "Costi",
+      "Alta probabilità di ottenere risultati falsi negativi",
+      "Alto numero di richieste"
+    ],
+    "risposta_corretta": "Costi"
+  },
+  {
+    "domanda": "Qual è il test di primo livello per l'approccio diagnostico a bambini con disabilità cognitiva e dismorfismi?",
+    "risposte": [
+      "Analisi del cariotipo",
+      "Analisi molecolare del gene FMR1",
+      "WGS",
+      "CGH-array"
+    ],
+    "risposta_corretta": "CGH-array"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni riguardo il WES è falsa?",
+    "risposte": [
+      "È in grado di sequenziare simultaneamente l'intera parte codificante dei nostri geni",
+      "Può produrre incidental finding",
+      "È in grado di identificare mutazioni puntiformi, copy number variants e altre varianti strutturali",
+      "È applicabile sia alla diagnosi sia alla ricerca"
+    ],
+    "risposta_corretta": "È in grado di identificare mutazioni puntiformi, copy number variants e altre varianti strutturali"
+  },
+  {
+    "domanda": "I disordini X-linked:",
+    "risposte": [
+      "Si presentano solo nei maschi",
+      "Si manifestano solo nelle femmine",
+      "Lo sviluppo e la gravità del fenotipo nei maschi e nelle femmine dipende dall'impatto funzionale della mutazione e da possibili mosaicismi",
+      "Rischio di trasmissione del 50% indipendente dal sesso"
+    ],
+    "risposta_corretta": "Lo sviluppo e la gravità del fenotipo nei maschi e nelle femmine dipende dall'impatto funzionale della mutazione e da possibili mosaicismi"
+  },
+  {
+    "domanda": "Le varianti non codificanti:",
+    "risposte": [
+      "Non sono associate con un fenotipo perché non determinano difetti a livello proteico",
+      "Possono causare un fenotipo patologico a causa dello splicing aberrante o dell'alterata espressione genica",
+      "Sono individuabili con WES ma non con i pannelli genetici",
+      "Nessuna delle precedenti"
+    ],
+    "risposta_corretta": "Possono causare un fenotipo patologico a causa dello splicing aberrante o dell'alterata espressione genica"
+  },
+  {
+    "domanda": "Una delezione cromosomica di 7.5Mb può essere identificata con:",
+    "risposte": [
+      "Analisi del cariotipo",
+      "FISH o CGH array",
+      "Ecografia prenatale del II trimestre",
+      "Sequenziamento del gene coinvolto nella delezione"
+    ],
+    "risposta_corretta": "Analisi del cariotipo"
+  },
+  {
+    "domanda": "Il rischio di prole affetta da sindrome di Down con una madre affetta da traslocazione robertsoniana 13;21 è:",
+    "risposte": [
+      "Correlato con l'età della madre al momento del concepimento",
+      "100%",
+      "50%",
+      "Meno del 10%"
+    ],
+    "risposta_corretta": "Meno del 10%"
+  },
+  {
+    "domanda": "Qual è l'uso più comune della NGS nella pratica clinica?",
+    "risposte": [
+      "Sequenziamento di specifici pannelli di geni in specifiche patologie",
+      "Sequenziamento dell'intero esoma",
+      "Sequenziamento dell'intero genoma",
+      "Nessuno dei precedenti"
+    ],
+    "risposta_corretta": "Sequenziamento di specifici pannelli di geni in specifiche patologie"
+  },
+  {
+    "domanda": "Qual è l'esame di primo livello nell'approccio diagnostico a un bambino di 1 anno con sola disabilità intellettiva?",
+    "risposte": [
+      "Analisi del cariotipo",
+      "Analisi molecolare di FMR1",
+      "WGS",
+      "CGH-array"
+    ],
+    "risposta_corretta": "CGH-array"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni riguardo il WES è vera?",
+    "risposte": [
+      "È capace di sequenziare simultaneamente l'intera regione codificante dei nostri geni",
+      "Il rendimento diagnostico è sempre pari a zero",
+      "Permette di identificare mutazioni puntiformi, copy number variants e altre varianti strutturali",
+      "È applicabile solo alla ricerca"
+    ],
+    "risposta_corretta": "È capace di sequenziare simultaneamente l'intera regione codificante dei nostri geni"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni su targeted panel sequencing è falsa:",
+    "risposte": [
+      "Può identificare mutazioni e CNV",
+      "È applicabile sia in diagnostica che in ricerca",
+      "Ha sensibilità diagnostica variabile nelle patologie monogeniche",
+      "Può analizzare simultaneamente fino a 50 geni selezionati"
+    ],
+    "risposta_corretta": "Può analizzare simultaneamente fino a 50 geni selezionati"
+  },
+  {
+    "domanda": "Un test genetico presintomatico:",
+    "risposte": [
+      "Se positivo permetterà di intraprendere precocemente uno specifico trattamento medico",
+      "Se positivo permetterà di definire il rischio generico di malattia ma non di predire con esattezza se il soggetto svilupperà patologia",
+      "Se positivo indica che il soggetto manifesterà con certezza la malattia in futuro",
+      "Se positivo indica che il soggetto è portatore sano di una mutazione recessiva"
+    ],
+    "risposta_corretta": "Se positivo indica che il soggetto manifesterà con certezza la malattia in futuro"
+  },
+  {
+    "domanda": "La diagnosi prenatale:",
+    "risposte": [
+      "Deve essere sempre effettuata il più precocemente possibile",
+      "È sempre invasiva",
+      "È sempre basata sull'analisi di un campione di DNA",
+      "Ha sempre un rischio aumentato di aborto"
+    ],
+    "risposta_corretta": "Deve essere sempre effettuata il più precocemente possibile"
+  },
+  {
+    "domanda": "La NIPT:",
+    "risposte": [
+      "È una tecnica minimamente invasiva",
+      "È una tecnica di diagnosi preimpianto",
+      "È basata sull'isolamento del DNA fetale presente nel sangue materno",
+      "È un test diagnostico che consente di determinare con certezza la presenza di anomalie genetiche"
+    ],
+    "risposta_corretta": "È basata sull'isolamento del DNA fetale presente nel sangue materno"
+  },
+  {
+    "domanda": "La consulenza genetica di una malattia a trasmissione dominante è spesso complicata da:",
+    "risposte": [
+      "Penetranza ridotta",
+      "Espressione variabile a seconda del genitore che trasmette la malattia",
+      "Imprinting materno",
+      "Fenotipo attenuato nei portatori eterozigoti"
+    ],
+    "risposta_corretta": "Penetranza ridotta"
+  },
+  {
+    "domanda": "Il test genetico preimpianto:",
+    "risposte": [
+      "Prevede l'analisi di cellule prelevate direttamente dal trofoblasto",
+      "Può essere effettuato in qualsiasi gravidanza con particolari accorgimenti",
+      "La percentuale di errore si aggira attorno al 3%",
+      "Prevede l'analisi di cellule prelevate direttamente dall'embrione"
+    ],
+    "risposta_corretta": "Prevede l'analisi di cellule prelevate direttamente dal trofoblasto"
+  },
+  {
+    "domanda": "Quali sono le tecniche di NGS più comunemente utilizzate nella pratica clinica?",
+    "risposte": [
+      "Sequenziamento dell'esoma e analisi di tutti i geni codificanti",
+      "Sequenziamento del genoma e analisi di varianti sia del DNA codificante che non codificante",
+      "Analisi mutazionale di singoli geni mediante sequenziamento Sanger",
+      "Sequenziamento di pannelli di geni o sequenziamento dell'esoma e analisi di pannelli virtuali"
+    ],
+    "risposta_corretta": "Sequenziamento di pannelli di geni o sequenziamento dell'esoma e analisi di pannelli virtuali"
+  },
+  {
+    "domanda": "La penetranza di una mutazione autosomica dominante identificata in un feto attraverso la diagnosi prenatale:",
+    "risposte": [
+      "È sempre prevedibile",
+      "È prevedibile solo in alcune patologie",
+      "È prevedibile se ci sono più individui affetti nella famiglia",
+      "Non è mai prevedibile"
+    ],
+    "risposta_corretta": "È prevedibile solo in alcune patologie"
+  },
+  {
+    "domanda": "Quale delle seguenti non è una indicazione alla diagnosi prenatale:",
+    "risposte": [
+      "Madre eterozigote per una mutazione nel gene della distrofia muscolare di Duchenne (gene DMD su cromosoma X)",
+      "Madre eterozigote di una mutazione nel gene della fenilchetonuria",
+      "Madre portatrice di traslocazione tra i cromosomi 3 e 5",
+      "Padre portatore di una traslocazione robertsoniana 14 e 21"
+    ],
+    "risposta_corretta": "Madre eterozigote di una mutazione nel gene della fenilchetonuria"
+  },
+  {
+    "domanda": "Lo svantaggio principale dei pannelli genici rispetto al sequenziamento dell'esoma è:",
+    "risposte": [
+      "La presenza di incidental findings",
+      "L'impossibilità di identificare mutazioni introniche o riarrangiamenti strutturali",
+      "La bassa copertura delle regioni sequenziate",
+      "L'impossibilità di identificare nuovi geni-malattia"
+    ],
+    "risposta_corretta": "L'impossibilità di identificare nuovi geni-malattia"
+  },
+  {
+    "domanda": "Il vantaggio principale dei pannelli genici rispetto al sequenziamento dell'esoma è:",
+    "risposte": [
+      "L'assenza di incidental findings",
+      "L'elevata copertura delle regioni sequenziate",
+      "La possibilità di identificare mutazioni introniche o riarrangiamenti strutturali",
+      "La possibilità di identificare nuovi geni-malattia"
+    ],
+    "risposta_corretta": "L'assenza di incidental findings"
+  },
+  {
+    "domanda": "Un bambino che si presenta con caratteri dismorfici, disabilità intellettiva, difetti cardiaci congeniti e schisi palatina. I genitori sono sani. L'analisi FISH per la delezione della sindrome di DiGeorge è negativa. Il prossimo passo?",
+    "risposte": [
+      "WGS",
+      "Analisi del cariotipo",
+      "Analisi di un pannello di geni di difetti cardiaci",
+      "Array CGH"
+    ],
+    "risposta_corretta": "Array CGH"
+  },
+  {
+    "domanda": "Gli oligonucleotidi antisenso sono formati da:",
+    "risposte": [
+      "ssRNA",
+      "ssDNA",
+      "Acidi nucleici virali",
+      "dsDNA"
+    ],
+    "risposta_corretta": "ssDNA"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni sugli incidental finding medically actionable è più accurata?",
+    "risposte": [
+      "Riferire tutti i tipi di varianti identificate nei geni causativi di malattie genetiche trattabili",
+      "Riferire le VUS identificate nei geni causativi di malattie genetiche trattabili",
+      "Riferire le varianti benigne o probabilmente benigne identificate in geni causativi di malattie genetiche trattabili",
+      "Riferire le varianti patogeniche o probabilmente patogeniche identificate in geni causativi di malattie genetiche trattabili"
+    ],
+    "risposta_corretta": "Riferire le varianti patogeniche o probabilmente patogeniche identificate in geni causativi di malattie genetiche trattabili"
+  },
+  {
+    "domanda": "Una delezione cromosomica di 8.5Mb può essere documentata con:",
+    "risposte": [
+      "Solo con sequenziamento dei geni inclusi nella regione deleta",
+      "Solo analisi array CGH",
+      "Cariotipo o analisi array CGH",
+      "Ecografia prenatale del II trimestre"
+    ],
+    "risposta_corretta": "Cariotipo o analisi array CGH"
+  },
+  {
+    "domanda": "La sensibilità del NGS per identificare un mosaicismo di basso grado di una certa variante dipende da:",
+    "risposte": [
+      "NGS è sempre in grado di evidenziare mosaicismi di basso grado",
+      "Il tipo di kit usato per preparare la sequencing library",
+      "La qualità delle reads",
+      "La profondità di copertura della variante"
+    ],
+    "risposta_corretta": "La profondità di copertura della variante"
+  },
+  {
+    "domanda": "Un bambino con una malattia autosomica dominante geneticamente eterogenea sottoposto a NGS di uno specifico panel di geni, ma non vengono trovate mutazioni. Le possibili cause sono:",
+    "risposte": [
+      "La mutazione risiede in una regione non codificante di uno dei geni testati",
+      "La mutazione è una delezione multiesonica non rilevata dall'analisi NGS",
+      "Tutte le risposte sono vere",
+      "La mutazione risiede in un nuovo gene non ancora associato alla malattia"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "Quanti geni sono inclusi nel WES?",
+    "risposte": [
+      "Circa 200",
+      "Circa 20.000",
+      "Circa 2.000",
+      "Circa 200.000"
+    ],
+    "risposta_corretta": "Circa 20.000"
+  },
+  {
+    "domanda": "Le alterazioni TAD:",
+    "risposte": [
+      "Risultano sempre da una duplicazione tandem",
+      "Sono sempre associati con meccanismi enhancer-adoption",
+      "Possono spiegare il fenotipo patologico associato con un riarrangiamento bilanciato de novo",
+      "Sono sempre associate con fenotipi patogenici"
+    ],
+    "risposta_corretta": "Possono spiegare il fenotipo patologico associato con un riarrangiamento bilanciato de novo"
+  },
+  {
+    "domanda": "Rispetto al WES, il WGS ha i seguenti vantaggi:",
+    "risposte": [
+      "Identificazione di traslocazioni cromosomiche bilanciate e riarrangiamenti strutturali",
+      "Identificazione di varianti canoniche di splicing",
+      "Numero inferiore di incidental findings",
+      "Aumento della semplicità di analisi bioinformatica dei dati e interpretazione delle varianti"
+    ],
+    "risposta_corretta": "Identificazione di traslocazioni cromosomiche bilanciate e riarrangiamenti strutturali"
+  },
+  {
+    "domanda": "Possibili indicazioni per test genetico in soggetti sani sono:",
+    "risposte": [
+      "Per organizzare strategie preventive o di follow-up (es. in caso di predisposizione familiare a neoplasie)",
+      "Per organizzare la diagnosi prenatale e indirizzare le scelte riproduttive",
+      "Per raggiungere una diagnosi precoce in un soggetto a rischio di avere mutazioni genetiche ereditarie",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "Quale delle seguenti non è una indicazione alla diagnosi prenatale:",
+    "risposte": [
+      "Madre portatrice di una traslocazione robertsoniana tra i cromosomi 13 e 21",
+      "Madre portatrice di una traslocazione tra i cromosomi 7 e 12",
+      "Madre portatrice eterozigote di una mutazione nel gene della fibrosi cistica (gene CFTR sul cromosoma 7)",
+      "Madre portatrice eterozigote di una mutazione nel gene della distrofia muscolare di Duchenne (gene DMD su cromosoma X)"
+    ],
+    "risposta_corretta": "Madre portatrice eterozigote di una mutazione nel gene della fibrosi cistica (gene CFTR sul cromosoma 7)"
+  },
+  {
+    "domanda": "Qual è il test di scelta nelle malattie geneticamente eterogenee:",
+    "risposte": [
+      "NGS",
+      "Sanger",
+      "SNP array",
+      "MLPA"
+    ],
+    "risposta_corretta": "NGS"
+  },
+  {
+    "domanda": "L'eredità pseudo-dominante è il risultato di:",
+    "risposte": [
+      "Consanguineità in generazioni consecutive",
+      "Segregazione di più di due mutazioni nella famiglia",
+      "Fenocopie",
+      "Tutte le risposte sono vere"
+    ],
+    "risposta_corretta": "Tutte le risposte sono vere"
+  },
+  {
+    "domanda": "L'analisi del cariotipo fetale è indicata:",
+    "risposte": [
+      "Quando la madre ha più di 35 anni",
+      "Quando la gravidanza è ottenuta mediante fertilizzazione in vitro",
+      "Quando il padre ha più di 50 anni",
+      "Quando i genitori sono consanguinei"
+    ],
+    "risposta_corretta": "Quando la madre ha più di 35 anni"
+  },
+  {
+    "domanda": "Nelle malattie autosomiche dominanti a penetranza completa:",
+    "risposte": [
+      "Ogni figlio di un genitore affetto ha il 25% di possibilità di essere affetto",
+      "Ogni figlio di un genitore affetto ha il 50% delle possibilità di essere affetto",
+      "Il genitore è omozigote per l'allele mutato",
+      "Il partner di un genitore affetto deve essere portatore di una mutazione dello stesso gene per essere a rischio di avere un secondo figlio affetto"
+    ],
+    "risposta_corretta": "Ogni figlio di un genitore affetto ha il 50% delle possibilità di essere affetto"
+  },
+  {
+    "domanda": "La diagnosi prenatale:",
+    "risposte": [
+      "È sempre invasiva",
+      "Tutte le altre risposte sono false",
+      "Può evidenziare difetti cromosomici o disordini monogenici",
+      "È sempre eseguita nel I trimestre di gravidanza"
+    ],
+    "risposta_corretta": "Può evidenziare difetti cromosomici o disordini monogenici"
+  },
+  {
+    "domanda": "Se cerchiamo nel database gnomAD il gene CFTR, causativo di fibrosi cistica:",
+    "risposte": [
+      "Abbiamo una lista di CNV individuate sia in soggetti sani sia in individui affetti",
+      "Abbiamo una struttura di geni e dei loro ortologhi",
+      "Abbiamo una lista di varianti identificate con sequenziamento di una ampia coorte di pazienti con la malattia",
+      "Abbiamo una lista di varianti identificate con sequenziamento di una ampia coorte di individui sani"
+    ],
+    "risposta_corretta": "Abbiamo una lista di varianti identificate con sequenziamento di una ampia coorte di individui sani"
+  },
+  {
+    "domanda": "La NIPT:",
+    "risposte": [
+      "È basata sull'isolamento di cellule fetali presenti nel circolo sanguigno materno",
+      "È utilizzata comunemente per ricercare mutazioni puntiformi",
+      "Ha sostituito le metodiche invasive come la villocentesi e l'amniocentesi",
+      "È un test di screening ed eventuali risultati patologici devono essere confermati da un test invasivo"
+    ],
+    "risposta_corretta": "È un test di screening ed eventuali risultati patologici devono essere confermati da un test invasivo"
+  },
+  {
+    "domanda": "Una duplicazione cromosomica di 120Kb può essere documentata con:",
+    "risposte": [
+      "Cariotipo",
+      "Array-CGH",
+      "MLPA",
+      "Sequenziamento Sanger dei geni coinvolti"
+    ],
+    "risposta_corretta": "Array-CGH"
+  },
+  {
+    "domanda": "La consulenza post-test è:",
+    "risposte": [
+      "Sempre necessaria per referti positivi",
+      "Sempre necessaria per indagini NGS, opzionale per test genetici più semplici come la ricerca di mutazioni note",
+      "Sempre effettuata da medico genetista",
+      "Dipende dalla patologia in esame"
+    ],
+    "risposta_corretta": "Sempre necessaria per referti positivi"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni riguardo il WES è falsa?",
+    "risposte": [
+      "Sequenzia circa il 10% del genoma",
+      "Ha un tasso di positività vicino all'80%",
+      "Può identificare mutazioni puntiformi e CNV",
+      "È applicabile in ricerca e in diagnostica"
+    ],
+    "risposta_corretta": "Ha un tasso di positività vicino all'80%"
+  },
+  {
+    "domanda": "La consulenza genetica:",
+    "risposte": [
+      "È necessaria solo la consulenza pre-test",
+      "È un percorso integrato che prevede la consulenza prima e dopo il test genetico",
+      "È opzionale",
+      "È necessaria solo la consulenza post-test"
+    ],
+    "risposta_corretta": "È un percorso integrato che prevede la consulenza prima e dopo il test genetico"
+  },
+  {
+    "domanda": "La sindrome di DiGeorge può essere diagnosticata con:",
+    "risposte": [
+      "Il sequenziamento dell'esoma",
+      "L'analisi del cariotipo",
+      "Sequenziamento del gene MECP2",
+      "Nessuna delle precedenti"
+    ],
+    "risposta_corretta": "Nessuna delle precedenti"
+  },
+  {
+    "domanda": "Quale delle seguenti affermazioni sul WES è falsa?",
+    "risposte": [
+      "Sequenzia il 2% del genoma",
+      "Ha un tasso di positività vicino all'80%",
+      "Non identifica CNV",
+      "Tutte le precedenti"
+    ],
+    "risposta_corretta": "Tutte le precedenti"
+  },
+  {
+    "domanda": "Il rischio di prole affetta da sindrome di Down da una madre portatrice di una traslocazione robertsoniana (21;21) è:",
+    "risposte": [
+      "Correlato con l'età della donna al momento del concepimento",
+      "75%",
+      "50%",
+      "Nessuna delle precedenti"
+    ],
+    "risposta_corretta": "Nessuna delle precedenti"
+  }
+]
