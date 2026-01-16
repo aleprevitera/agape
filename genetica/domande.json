@@ -552,7 +552,7 @@
       "Ecografia prenatale del II trimestre",
       "Sequenziamento del gene coinvolto nella delezione"
     ],
-    "risposta_corretta": "Analisi del cariotipo"
+    "risposta_corretta": "FISH o CGH array"
   },
   {
     "domanda": "Il rischio di prole affetta da sindrome di Down con una madre affetta da traslocazione robertsoniana 13;21 è:",
@@ -942,7 +942,7 @@
       "Non identifica CNV",
       "Tutte le precedenti"
     ],
-    "risposta_corretta": "Tutte le precedenti"
+    "risposta_corretta": "Ha un tasso di positività vicino all'80%"
   },
   {
     "domanda": "Il rischio di prole affetta da sindrome di Down da una madre portatrice di una traslocazione robertsoniana (21;21) è:",
