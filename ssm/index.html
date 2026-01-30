@@ -42,6 +42,9 @@
         .btn-primary:hover { background: #333; }
         .btn-secondary { background: #fff; color: #1a1a1a; border: 1px solid #e0e0e0; }
         .btn-secondary:hover { background: #f5f5f5; }
+        .btn-danger { background: #cb2431; color: #fff; }
+        .btn-danger:hover { background: #a51d28; }
+        .btn-small { padding: 8px 16px; font-size: 0.8125rem; }
         .actions { display: flex; gap: 12px; margin-top: 20px; }
         .results { text-align: center; padding: 48px 24px; }
         .results h2 { font-size: 1.75rem; margin-bottom: 8px; }
@@ -90,11 +93,49 @@
         .modal-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 2rem; cursor: pointer; }
         .review-image { margin: 8px 0; }
         .review-image img { max-width: 100%; max-height: 150px; border-radius: 4px; }
+
+        /* Stats styles */
+        .stats-screen { padding: 24px 0; }
+        .stats-screen h1 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
+        .stats-screen .subtitle { color: #666; margin-bottom: 24px; text-align: center; font-size: 0.875rem; }
+        .stats-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+        .stats-summary-item { background: #fff; padding: 16px; border-radius: 8px; text-align: center; }
+        .stats-summary-value { font-size: 1.5rem; font-weight: 700; }
+        .stats-summary-label { font-size: 0.75rem; color: #666; text-transform: uppercase; }
+        .stats-section { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+        .stats-section h3 { font-size: 1rem; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+        .stats-section h3 .toggle { font-size: 0.75rem; color: #0969da; cursor: pointer; }
+        .stat-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-name { flex: 1; font-size: 0.875rem; min-width: 0; }
+        .stat-name span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat-bar-container { width: 120px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+        .stat-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .stat-bar.good { background: #22863a; }
+        .stat-bar.medium { background: #dbab09; }
+        .stat-bar.bad { background: #cb2431; }
+        .stat-value { width: 60px; text-align: right; font-size: 0.8125rem; font-weight: 500; }
+        .stat-count { width: 40px; text-align: right; font-size: 0.75rem; color: #888; }
+        .weak-areas { background: #ffeef0; border: 1px solid #ffcdd2; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .weak-areas h3 { color: #cb2431; font-size: 0.875rem; margin-bottom: 12px; }
+        .weak-areas ul { list-style: none; }
+        .weak-areas li { padding: 6px 0; font-size: 0.875rem; border-bottom: 1px solid #ffcdd2; display: flex; justify-content: space-between; }
+        .weak-areas li:last-child { border-bottom: none; }
+        .weak-areas .weak-pct { color: #cb2431; font-weight: 500; }
+        .no-stats { text-align: center; padding: 40px; color: #888; }
+        .argomenti-list { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .argomenti-list.expanded { max-height: 1000px; }
+        .argomenti-list .stat-row { padding-left: 16px; background: #fafafa; }
+        .argomenti-list .stat-name { font-size: 0.8125rem; color: #666; }
+        .practice-weak-btn { margin-top: 12px; }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .question-card { padding: 20px 16px; }
             .results-breakdown { flex-direction: column; gap: 16px; }
             .start-screen h1 { font-size: 1.5rem; }
+            .stats-summary { grid-template-columns: 1fr; }
+            .stat-bar-container { width: 80px; }
         }
     </style>
 </head>
@@ -108,10 +149,14 @@
         const app = document.getElementById('app');
         let questions = [];
         let materie = [];
+        let argomenti = {};
         let quiz = null;
         let wrongIds = [];
         let selectedMaterie = [];
+        let statsData = { materie: {}, argomenti: {} };
+
         const STORAGE_KEY = 'quiz_ssm_wrong';
+        const STATS_KEY = 'quiz_ssm_stats';
 
         function loadWrong() {
             try { wrongIds = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -120,6 +165,64 @@
 
         function saveWrong() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
+        }
+
+        function loadStats() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STATS_KEY));
+                if (saved) statsData = saved;
+            } catch(e) {
+                statsData = { materie: {}, argomenti: {} };
+            }
+        }
+
+        function saveStats() {
+            localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
+        }
+
+        function recordAnswer(materia, argomento, isCorrect) {
+            // Materia stats
+            if (!statsData.materie[materia]) {
+                statsData.materie[materia] = { correct: 0, total: 0 };
+            }
+            statsData.materie[materia].total++;
+            if (isCorrect) statsData.materie[materia].correct++;
+
+            // Argomento stats
+            const argKey = `${materia}|||${argomento}`;
+            if (!statsData.argomenti[argKey]) {
+                statsData.argomenti[argKey] = { correct: 0, total: 0, materia, argomento };
+            }
+            statsData.argomenti[argKey].total++;
+            if (isCorrect) statsData.argomenti[argKey].correct++;
+
+            saveStats();
+        }
+
+        function getWeakAreas(threshold = 60, minAnswers = 3) {
+            const weak = [];
+
+            // Check materie
+            Object.entries(statsData.materie).forEach(([name, data]) => {
+                if (data.total >= minAnswers) {
+                    const pct = Math.round(data.correct / data.total * 100);
+                    if (pct < threshold) {
+                        weak.push({ type: 'materia', name, pct, total: data.total });
+                    }
+                }
+            });
+
+            // Check argomenti
+            Object.entries(statsData.argomenti).forEach(([key, data]) => {
+                if (data.total >= minAnswers) {
+                    const pct = Math.round(data.correct / data.total * 100);
+                    if (pct < threshold) {
+                        weak.push({ type: 'argomento', name: data.argomento, materia: data.materia, pct, total: data.total });
+                    }
+                }
+            });
+
+            return weak.sort((a, b) => a.pct - b.pct);
         }
 
         function shuffle(arr) {
@@ -149,7 +252,10 @@
 
         function showStart() {
             loadWrong();
+            loadStats();
             const wrongDisabled = wrongIds.length === 0 ? 'disabled' : '';
+            const weakAreas = getWeakAreas();
+            const hasStats = Object.keys(statsData.materie).length > 0;
 
             render(`
                 <div class="start-screen">
@@ -172,8 +278,15 @@
                             <strong>Ripassa errori</strong>
                             <span>${wrongIds.length} domande da rivedere</span>
                         </div>
+                        ${weakAreas.length > 0 ? `
+                        <div class="mode-option" data-mode="weak" style="border-color:#cb2431;">
+                            <strong style="color:#cb2431;">Rinforza punti deboli</strong>
+                            <span>${weakAreas.length} aree sotto il 60%</span>
+                        </div>
+                        ` : ''}
                     </div>
                     <button class="btn btn-primary" id="start-btn">Inizia</button>
+                    ${hasStats ? `<button class="btn btn-secondary" id="stats-btn" style="margin-left:12px;">Statistiche</button>` : ''}
                     <p style="margin-top:24px;font-size:0.8rem;color:#888;">${questions.length} domande disponibili</p>
                 </div>
             `);
@@ -191,10 +304,203 @@
             document.getElementById('start-btn').addEventListener('click', () => {
                 if (selectedMode === 'custom') {
                     showCustomSetup();
+                } else if (selectedMode === 'weak') {
+                    startWeakAreasQuiz();
                 } else {
                     startQuiz(selectedMode);
                 }
             });
+
+            const statsBtn = document.getElementById('stats-btn');
+            if (statsBtn) {
+                statsBtn.addEventListener('click', showStats);
+            }
+        }
+
+        function showStats() {
+            loadStats();
+            const totalAnswered = Object.values(statsData.materie).reduce((sum, m) => sum + m.total, 0);
+            const totalCorrect = Object.values(statsData.materie).reduce((sum, m) => sum + m.correct, 0);
+            const overallPct = totalAnswered > 0 ? Math.round(totalCorrect / totalAnswered * 100) : 0;
+            const weakAreas = getWeakAreas();
+
+            // Sort materie by percentage (ascending = worst first)
+            const materieStats = Object.entries(statsData.materie)
+                .map(([name, data]) => ({
+                    name,
+                    correct: data.correct,
+                    total: data.total,
+                    pct: Math.round(data.correct / data.total * 100)
+                }))
+                .sort((a, b) => a.pct - b.pct);
+
+            // Group argomenti by materia
+            const argomentiByMateria = {};
+            Object.entries(statsData.argomenti).forEach(([key, data]) => {
+                if (!argomentiByMateria[data.materia]) {
+                    argomentiByMateria[data.materia] = [];
+                }
+                argomentiByMateria[data.materia].push({
+                    name: data.argomento,
+                    correct: data.correct,
+                    total: data.total,
+                    pct: Math.round(data.correct / data.total * 100)
+                });
+            });
+
+            // Sort argomenti within each materia
+            Object.keys(argomentiByMateria).forEach(m => {
+                argomentiByMateria[m].sort((a, b) => a.pct - b.pct);
+            });
+
+            function getBarClass(pct) {
+                if (pct >= 70) return 'good';
+                if (pct >= 50) return 'medium';
+                return 'bad';
+            }
+
+            let weakHtml = '';
+            if (weakAreas.length > 0) {
+                weakHtml = `
+                    <div class="weak-areas">
+                        <h3>Aree da ripassare (sotto 60%)</h3>
+                        <ul>
+                            ${weakAreas.slice(0, 8).map(w => `
+                                <li>
+                                    <span>${w.type === 'argomento' ? `${w.materia} → ${w.name}` : w.name}</span>
+                                    <span class="weak-pct">${w.pct}% (${w.total} risposte)</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <button class="btn btn-primary btn-small practice-weak-btn" id="practice-weak-btn">Esercitati su questi argomenti</button>
+                    </div>
+                `;
+            }
+
+            let materieHtml = '';
+            if (materieStats.length > 0) {
+                materieHtml = `
+                    <div class="stats-section">
+                        <h3>Performance per Materia</h3>
+                        ${materieStats.map(m => `
+                            <div class="stat-row materia-row" data-materia="${encodeURIComponent(m.name)}">
+                                <div class="stat-name"><span title="${m.name}">${m.name}</span></div>
+                                <div class="stat-bar-container">
+                                    <div class="stat-bar ${getBarClass(m.pct)}" style="width:${m.pct}%"></div>
+                                </div>
+                                <div class="stat-value">${m.pct}%</div>
+                                <div class="stat-count">${m.total}</div>
+                            </div>
+                            <div class="argomenti-list" id="arg-${encodeURIComponent(m.name)}">
+                                ${(argomentiByMateria[m.name] || []).map(a => `
+                                    <div class="stat-row">
+                                        <div class="stat-name"><span title="${a.name}">${a.name}</span></div>
+                                        <div class="stat-bar-container">
+                                            <div class="stat-bar ${getBarClass(a.pct)}" style="width:${a.pct}%"></div>
+                                        </div>
+                                        <div class="stat-value">${a.pct}%</div>
+                                        <div class="stat-count">${a.total}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                        <p style="margin-top:12px;font-size:0.75rem;color:#888;">Clicca su una materia per vedere gli argomenti</p>
+                    </div>
+                `;
+            }
+
+            render(`
+                <div class="stats-screen">
+                    <h1>Statistiche</h1>
+                    <p class="subtitle">Analisi delle tue performance</p>
+
+                    <div class="stats-summary">
+                        <div class="stats-summary-item">
+                            <div class="stats-summary-value">${totalAnswered}</div>
+                            <div class="stats-summary-label">Risposte totali</div>
+                        </div>
+                        <div class="stats-summary-item">
+                            <div class="stats-summary-value">${overallPct}%</div>
+                            <div class="stats-summary-label">Media generale</div>
+                        </div>
+                        <div class="stats-summary-item">
+                            <div class="stats-summary-value">${materieStats.length}</div>
+                            <div class="stats-summary-label">Materie studiate</div>
+                        </div>
+                    </div>
+
+                    ${weakHtml}
+                    ${materieHtml}
+
+                    ${totalAnswered === 0 ? '<div class="no-stats">Nessuna statistica ancora. Inizia un quiz!</div>' : ''}
+
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="back-btn">Torna al menu</button>
+                        ${totalAnswered > 0 ? '<button class="btn btn-danger btn-small" id="reset-stats-btn">Azzera statistiche</button>' : ''}
+                    </div>
+                </div>
+            `);
+
+            document.getElementById('back-btn').addEventListener('click', showStart);
+
+            const resetBtn = document.getElementById('reset-stats-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    if (confirm('Sei sicuro di voler azzerare tutte le statistiche?')) {
+                        statsData = { materie: {}, argomenti: {} };
+                        saveStats();
+                        showStats();
+                    }
+                });
+            }
+
+            const practiceWeakBtn = document.getElementById('practice-weak-btn');
+            if (practiceWeakBtn) {
+                practiceWeakBtn.addEventListener('click', startWeakAreasQuiz);
+            }
+
+            // Toggle argomenti visibility
+            document.querySelectorAll('.materia-row').forEach(row => {
+                row.style.cursor = 'pointer';
+                row.addEventListener('click', function() {
+                    const materia = decodeURIComponent(this.dataset.materia);
+                    const argList = document.getElementById('arg-' + encodeURIComponent(materia));
+                    if (argList) {
+                        argList.classList.toggle('expanded');
+                    }
+                });
+            });
+        }
+
+        function startWeakAreasQuiz() {
+            const weakAreas = getWeakAreas();
+            const weakMaterie = new Set();
+            const weakArgomenti = new Set();
+
+            weakAreas.forEach(w => {
+                if (w.type === 'materia') {
+                    weakMaterie.add(w.name);
+                } else {
+                    weakArgomenti.add(`${w.materia}|||${w.argomento}`);
+                }
+            });
+
+            // Get questions from weak areas
+            let pool = questions.map((q, i) => i).filter(i => {
+                const q = questions[i];
+                const argKey = `${q.materia}|||${q.argomenti}`;
+                return weakMaterie.has(q.materia) || weakArgomenti.has(argKey);
+            });
+
+            if (pool.length === 0) {
+                alert('Nessuna domanda disponibile per le aree deboli');
+                showStart();
+                return;
+            }
+
+            pool = shuffle(pool).slice(0, Math.min(30, pool.length));
+            quiz = { pool, current: 0, correct: 0, mistakes: [] };
+            showQuestion();
         }
 
         function showCustomSetup() {
@@ -298,7 +604,7 @@
                     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
                 </header>
                 <div class="question-card">
-                    <div class="question-number">Domanda ${quiz.current + 1}</div>
+                    <div class="question-number">Domanda ${quiz.current + 1} · ${q.argomenti}</div>
                     <div class="question-text">${q.domanda}</div>
                     ${q.has_image && q.image_src ? `<div class="question-image"><img src="${q.image_src}" alt="Immagine domanda" onclick="openModal(this.src)"></div>` : ''}
                     <div class="options" id="options">
@@ -329,6 +635,9 @@
             const isCorrect = btn.dataset.correct === 'true';
             const userAnswer = btn.textContent;
 
+            // Record stats
+            recordAnswer(q.materia, q.argomenti, isCorrect);
+
             document.querySelectorAll('.option').forEach(b => {
                 b.classList.add('disabled');
                 if (b.dataset.correct === 'true') {
@@ -346,6 +655,7 @@
                 quiz.mistakes.push({
                     domanda: q.domanda,
                     materia: q.materia,
+                    argomento: q.argomenti,
                     tua: userAnswer,
                     corretta: q.risposta_corretta_text,
                     commento: q.commento,
@@ -389,7 +699,7 @@
                         <h3>Da ripassare (${quiz.mistakes.length})</h3>
                         ${quiz.mistakes.map(m => `
                             <div class="review-item">
-                                <div class="review-materia">${m.materia}</div>
+                                <div class="review-materia">${m.materia} → ${m.argomento}</div>
                                 <div class="review-question">${m.domanda}</div>
                                 ${m.has_image && m.image_src ? `<div class="review-image"><img src="${m.image_src}" alt="Immagine"></div>` : ''}
                                 <div class="review-your">Hai risposto: ${m.tua}</div>
@@ -413,6 +723,7 @@
                     </div>
                     <div class="actions" style="justify-content:center;">
                         <button class="btn btn-primary" id="restart-btn">Nuovo quiz</button>
+                        <button class="btn btn-secondary" id="stats-btn">Statistiche</button>
                         <button class="btn btn-secondary" id="home-btn">Menu</button>
                     </div>
                     ${reviewHtml}
@@ -420,6 +731,7 @@
             `);
 
             document.getElementById('restart-btn').addEventListener('click', () => startQuiz('20'));
+            document.getElementById('stats-btn').addEventListener('click', showStats);
             document.getElementById('home-btn').addEventListener('click', showStart);
         }
 
@@ -437,6 +749,14 @@
                     return q;
                 });
                 materie = [...new Set(questions.map(q => q.materia))].sort();
+
+                // Build argomenti map
+                questions.forEach(q => {
+                    if (!argomenti[q.materia]) argomenti[q.materia] = new Set();
+                    argomenti[q.materia].add(q.argomenti);
+                });
+
+                loadStats();
                 showStart();
             })
             .catch(() => {
