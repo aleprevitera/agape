@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz SSM - Specializzazioni Mediche</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -129,6 +130,24 @@
         .argomenti-list .stat-name { font-size: 0.8125rem; color: #666; }
         .practice-weak-btn { margin-top: 12px; }
 
+        /* Auth styles */
+        .auth-header { display: flex; justify-content: flex-end; padding: 12px 0; margin-bottom: 8px; }
+        .auth-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.875rem; transition: all 0.15s ease; }
+        .auth-btn:hover { background: #f5f5f5; border-color: #999; }
+        .auth-btn img { width: 18px; height: 18px; }
+        .auth-btn.logout { border-color: #ffcdd2; color: #cb2431; }
+        .auth-btn.logout:hover { background: #ffeef0; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-email { font-size: 0.8125rem; color: #666; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sync-indicator { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #888; }
+        .sync-indicator.syncing { color: #0969da; }
+        .sync-indicator.synced { color: #22863a; }
+        .sync-indicator.offline { color: #cb2431; }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+        .sync-indicator.syncing .sync-dot { animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .google-icon { width: 18px; height: 18px; }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .question-card { padding: 20px 16px; }
@@ -136,6 +155,7 @@
             .start-screen h1 { font-size: 1.5rem; }
             .stats-summary { grid-template-columns: 1fr; }
             .stat-bar-container { width: 80px; }
+            .user-email { max-width: 100px; }
         }
     </style>
 </head>
@@ -158,6 +178,202 @@
         const STORAGE_KEY = 'quiz_ssm_wrong';
         const STATS_KEY = 'quiz_ssm_stats';
 
+        // Supabase configuration
+        const SUPABASE_URL = 'https://obckabzhhzcpxajaxxjo.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_Nv_TRfwJuYUJ9gB-m6EKCA_Xfc_PX13';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUser = null;
+        let syncStatus = 'offline'; // 'offline', 'syncing', 'synced'
+        let syncTimeout = null;
+
+        // Auth functions
+        async function initAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await syncFromCloud();
+            }
+
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    currentUser = session.user;
+                    await syncFromCloud();
+                    showStart();
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    syncStatus = 'offline';
+                    showStart();
+                }
+            });
+        }
+
+        async function loginWithGoogle() {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin + window.location.pathname
+                }
+            });
+            if (error) {
+                console.error('Login error:', error);
+                alert('Errore durante il login: ' + error.message);
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            syncStatus = 'offline';
+        }
+
+        // Sync functions
+        async function syncFromCloud() {
+            if (!currentUser) return;
+
+            syncStatus = 'syncing';
+            updateSyncIndicator();
+
+            try {
+                const { data, error } = await supabase
+                    .from('user_progress')
+                    .select('stats_data, wrong_ids')
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+                    throw error;
+                }
+
+                if (data) {
+                    // Merge cloud data with local
+                    const cloudStats = data.stats_data || { materie: {}, argomenti: {} };
+                    const cloudWrong = data.wrong_ids || [];
+
+                    statsData = mergeStats(statsData, cloudStats);
+                    wrongIds = mergeWrongIds(wrongIds, cloudWrong);
+
+                    saveStats();
+                    saveWrong();
+                }
+
+                // Push merged data back to cloud
+                await syncToCloud();
+                syncStatus = 'synced';
+            } catch (err) {
+                console.error('Sync from cloud error:', err);
+                syncStatus = 'offline';
+            }
+
+            updateSyncIndicator();
+        }
+
+        async function syncToCloud() {
+            if (!currentUser) return;
+
+            try {
+                const { error } = await supabase
+                    .from('user_progress')
+                    .upsert({
+                        user_id: currentUser.id,
+                        stats_data: statsData,
+                        wrong_ids: wrongIds,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' });
+
+                if (error) throw error;
+                syncStatus = 'synced';
+            } catch (err) {
+                console.error('Sync to cloud error:', err);
+                syncStatus = 'offline';
+            }
+
+            updateSyncIndicator();
+        }
+
+        function debouncedSync() {
+            if (!currentUser) return;
+
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncStatus = 'syncing';
+            updateSyncIndicator();
+
+            syncTimeout = setTimeout(() => {
+                syncToCloud();
+            }, 2000); // Wait 2 seconds before syncing
+        }
+
+        function mergeStats(local, cloud) {
+            const merged = { materie: {}, argomenti: {} };
+
+            // Merge materie
+            const allMaterie = new Set([...Object.keys(local.materie || {}), ...Object.keys(cloud.materie || {})]);
+            allMaterie.forEach(m => {
+                const localM = (local.materie || {})[m] || { correct: 0, total: 0 };
+                const cloudM = (cloud.materie || {})[m] || { correct: 0, total: 0 };
+                merged.materie[m] = {
+                    correct: Math.max(localM.correct, cloudM.correct),
+                    total: Math.max(localM.total, cloudM.total)
+                };
+            });
+
+            // Merge argomenti
+            const allArg = new Set([...Object.keys(local.argomenti || {}), ...Object.keys(cloud.argomenti || {})]);
+            allArg.forEach(a => {
+                const localA = (local.argomenti || {})[a] || { correct: 0, total: 0, materia: '', argomento: '' };
+                const cloudA = (cloud.argomenti || {})[a] || { correct: 0, total: 0, materia: '', argomento: '' };
+                merged.argomenti[a] = {
+                    correct: Math.max(localA.correct, cloudA.correct),
+                    total: Math.max(localA.total, cloudA.total),
+                    materia: localA.materia || cloudA.materia,
+                    argomento: localA.argomento || cloudA.argomento
+                };
+            });
+
+            return merged;
+        }
+
+        function mergeWrongIds(local, cloud) {
+            return [...new Set([...local, ...cloud])];
+        }
+
+        function updateSyncIndicator() {
+            const indicator = document.getElementById('sync-indicator');
+            if (!indicator) return;
+
+            indicator.className = 'sync-indicator ' + syncStatus;
+            const labels = { offline: 'Offline', syncing: 'Sincronizzando...', synced: 'Sincronizzato' };
+            indicator.innerHTML = `<span class="sync-dot"></span>${labels[syncStatus]}`;
+        }
+
+        function getAuthHeaderHtml() {
+            if (currentUser) {
+                return `
+                    <div class="auth-header">
+                        <div class="user-info">
+                            <span id="sync-indicator" class="sync-indicator ${syncStatus}">
+                                <span class="sync-dot"></span>${syncStatus === 'synced' ? 'Sincronizzato' : syncStatus === 'syncing' ? 'Sincronizzando...' : 'Offline'}
+                            </span>
+                            <span class="user-email" title="${currentUser.email}">${currentUser.email}</span>
+                            <button class="auth-btn logout" onclick="window.doLogout()">Esci</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="auth-header">
+                        <button class="auth-btn" onclick="window.doLogin()">
+                            <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                            Accedi con Google
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        window.doLogin = loginWithGoogle;
+        window.doLogout = logout;
+
         function loadWrong() {
             try { wrongIds = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
             catch(e) { wrongIds = []; }
@@ -165,6 +381,7 @@
 
         function saveWrong() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
+            debouncedSync();
         }
 
         function loadStats() {
@@ -178,6 +395,7 @@
 
         function saveStats() {
             localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
+            debouncedSync();
         }
 
         function recordAnswer(materia, argomento, isCorrect) {
@@ -258,6 +476,7 @@
             const hasStats = Object.keys(statsData.materie).length > 0;
 
             render(`
+                ${getAuthHeaderHtml()}
                 <div class="start-screen">
                     <h1>SSM Simulator</h1>
                     <p class="subtitle">Quiz di preparazione alle Specializzazioni Mediche</p>
@@ -410,6 +629,7 @@
             }
 
             render(`
+                ${getAuthHeaderHtml()}
                 <div class="stats-screen">
                     <h1>Statistiche</h1>
                     <p class="subtitle">Analisi delle tue performance</p>
@@ -506,6 +726,7 @@
         function showCustomSetup() {
             selectedMaterie = [];
             render(`
+                ${getAuthHeaderHtml()}
                 <div class="start-screen">
                     <h1>Quiz Personalizzato</h1>
                     <p class="subtitle">Seleziona le materie da includere</p>
@@ -712,6 +933,7 @@
             }
 
             render(`
+                ${getAuthHeaderHtml()}
                 <div class="results">
                     <h2>Risultati</h2>
                     <div class="score">${pct}%</div>
@@ -757,7 +979,7 @@
                 });
 
                 loadStats();
-                showStart();
+                initAuth().then(() => showStart());
             })
             .catch(() => {
                 render(`
