@@ -1005,14 +1005,45 @@
 
             const resetBtn = document.getElementById('reset-stats-btn');
             if (resetBtn) {
-                resetBtn.addEventListener('click', () => {
+                resetBtn.addEventListener('click', async () => {
                     if (confirm('Sei sicuro di voler azzerare tutte le statistiche, simulazioni e storico?')) {
+                        // Reset all data
                         statsData = { materie: {}, argomenti: {} };
                         simulations = [];
                         projectionHistory = [];
-                        saveStats();
-                        saveSimulations();
-                        saveProjectionHistory();
+                        wrongIds = [];
+
+                        // Save to localStorage
+                        localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
+                        localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
+                        localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
+
+                        // Cancel any pending debounced sync
+                        if (syncTimeout) {
+                            clearTimeout(syncTimeout);
+                            syncTimeout = null;
+                        }
+
+                        // Immediate sync to cloud (not debounced)
+                        if (currentUser) {
+                            try {
+                                await supabase
+                                    .from('user_progress')
+                                    .upsert({
+                                        user_id: currentUser.id,
+                                        stats_data: statsData,
+                                        wrong_ids: wrongIds,
+                                        simulations: simulations,
+                                        projection_history: projectionHistory,
+                                        updated_at: new Date().toISOString()
+                                    }, { onConflict: 'user_id' });
+                                syncStatus = 'synced';
+                            } catch (err) {
+                                console.error('Reset sync error:', err);
+                            }
+                        }
+
                         showStats();
                     }
                 });
