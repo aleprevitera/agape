@@ -697,7 +697,7 @@
             render(`
                 ${getAuthHeaderHtml()}
                 <div class="start-screen">
-                    <h1>SSM Simulator</h1>
+                    <h1>Simulatore SSM</h1>
                     <p class="subtitle">Quiz di preparazione alle Specializzazioni Mediche</p>
                     <div class="mode-select">
                         <div class="mode-option selected" data-mode="140">
@@ -1331,7 +1331,7 @@
             render(`
                 <header>
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h1>SSM Simulator <span class="materia-tag">${q.materia}</span></h1>
+                        <h1>Simulatore SSM <span class="materia-tag">${q.materia}</span></h1>
                         ${isSSM ? `<div id="timer" class="timer">${formatTime(quiz.endTime - Date.now())}</div>` : ''}
                     </div>
                     <div class="stats">${statsHtml}</div>
