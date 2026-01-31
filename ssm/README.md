@@ -91,6 +91,7 @@ const SUPABASE_KEY = 'tua-anon-key';
 | Ortopedia | 7 |
 | Pneumologia e Chirurgia Toracica | 6 |
 | Dermatologia | 6 |
+| Gastroenterologia | 5 |
 | Endocrinologia e Nutrizione | 5 |
 | Malattie Infettive e Microbiologia | 5 |
 | Radiologia | 5 |
@@ -105,7 +106,12 @@ const SUPABASE_KEY = 'tua-anon-key';
 | Oftalmologia | 2 |
 | Medicina del Lavoro | 2 |
 | Medicina legale | 2 |
+| *Immunologia* | 2 |
+| *Genetica* | 2 |
+| *Scienze di base* | 2 |
 | **Totale** | **140** |
+
+> *Le ultime 3 materie non sono nell'SSM ufficiale ma sono presenti nel database per completare le 140 domande.*
 
 ## Formato Domande
 
