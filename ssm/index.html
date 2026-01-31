@@ -254,6 +254,7 @@
         let syncStatus = 'offline'; // 'offline', 'syncing', 'synced'
         let syncTimeout = null;
         let timerInterval = null;
+        let initialSyncDone = false; // Block outgoing sync until we've loaded from cloud
 
         // Auth functions
         async function initAuth() {
@@ -293,6 +294,7 @@
             await supabase.auth.signOut();
             currentUser = null;
             syncStatus = 'offline';
+            initialSyncDone = false;
         }
 
         // Sync functions
@@ -334,6 +336,7 @@
                 // If cloud fails, keep using local data as fallback
             }
 
+            initialSyncDone = true; // Now allow outgoing syncs
             updateSyncIndicator();
         }
 
@@ -378,6 +381,7 @@
 
         function debouncedSync() {
             if (!currentUser) return;
+            if (!initialSyncDone) return; // Don't sync TO cloud until we've loaded FROM cloud
 
             if (syncTimeout) clearTimeout(syncTimeout);
             syncStatus = 'syncing';
