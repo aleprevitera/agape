@@ -1339,7 +1339,7 @@
                     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
                 </header>
                 <div class="question-card">
-                    <div class="question-number">Domanda ${quiz.current + 1} · ${q.argomenti}</div>
+                    <div class="question-number">Domanda ${quiz.current + 1}</div>
                     <div class="question-text">${q.domanda}</div>
                     ${q.has_image && q.image_src ? `<div class="question-image"><img src="${q.image_src}" alt="Immagine domanda" onclick="openModal(this.src)"></div>` : ''}
                     <div class="options" id="options">
