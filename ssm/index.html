@@ -314,30 +314,24 @@
                 }
 
                 if (data) {
-                    // Merge cloud data with local (handle missing columns gracefully)
-                    const cloudStats = data.stats_data || { materie: {}, argomenti: {} };
-                    const cloudWrong = data.wrong_ids || [];
-                    const cloudSimulations = data.simulations || [];
-                    const cloudProjectionHistory = data.projection_history || [];
+                    // Cloud is source of truth - REPLACE local data (no merge)
+                    statsData = data.stats_data || { materie: {}, argomenti: {} };
+                    wrongIds = data.wrong_ids || [];
+                    simulations = data.simulations || [];
+                    projectionHistory = data.projection_history || [];
 
-                    statsData = mergeStats(statsData, cloudStats);
-                    wrongIds = mergeWrongIds(wrongIds, cloudWrong);
-                    simulations = mergeSimulations(simulations, cloudSimulations);
-                    projectionHistory = mergeProjectionHistory(projectionHistory, cloudProjectionHistory);
-
-                    // Save to localStorage (don't trigger sync again)
+                    // Save to localStorage as cache
                     localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
                     localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
                     localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
                 }
 
-                // Push merged data back to cloud
-                await syncToCloud();
                 syncStatus = 'synced';
             } catch (err) {
                 console.error('Sync from cloud error:', err);
                 syncStatus = 'offline';
+                // If cloud fails, keep using local data as fallback
             }
 
             updateSyncIndicator();
