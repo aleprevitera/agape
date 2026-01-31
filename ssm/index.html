@@ -130,6 +130,18 @@
         .argomenti-list .stat-name { font-size: 0.8125rem; color: #666; }
         .practice-weak-btn { margin-top: 12px; }
 
+        /* Timer styles */
+        .timer { font-size: 1rem; font-weight: 600; padding: 8px 16px; background: #f5f5f5; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; }
+        .timer.warning { background: #fff3cd; color: #856404; }
+        .timer.danger { background: #ffeef0; color: #cb2431; animation: pulse 1s infinite; }
+        .timer-icon { width: 16px; height: 16px; }
+        .option.selected { border-color: #0969da; background: #e8f4fd; color: #0969da; }
+        .question-nav-btn { width: 32px; height: 32px; border: 1px solid #e0e0e0; border-radius: 4px; background: #fff; cursor: pointer; font-size: 0.75rem; transition: all 0.15s; }
+        .question-nav-btn:hover { border-color: #999; }
+        .question-nav-btn.current { border-color: #0969da; background: #e8f4fd; color: #0969da; font-weight: 600; }
+        .question-nav-btn.answered { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+        .question-nav-btn.answered.current { background: #0969da; border-color: #0969da; }
+
         /* Auth styles */
         .auth-header { display: flex; justify-content: flex-end; padding: 12px 0; margin-bottom: 8px; }
         .auth-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.875rem; transition: all 0.15s ease; }
@@ -186,6 +198,7 @@
         let currentUser = null;
         let syncStatus = 'offline'; // 'offline', 'syncing', 'synced'
         let syncTimeout = null;
+        let timerInterval = null;
 
         // Auth functions
         async function initAuth() {
@@ -469,6 +482,11 @@
         };
 
         function showStart() {
+            // Clear any running timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
             loadWrong();
             loadStats();
             const wrongDisabled = wrongIds.length === 0 ? 'disabled' : '';
@@ -719,7 +737,7 @@
             }
 
             pool = shuffle(pool).slice(0, Math.min(30, pool.length));
-            quiz = { pool, current: 0, correct: 0, mistakes: [] };
+            quiz = { pool, current: 0, correct: 0, wrong: 0, skipped: 0, mistakes: [], mode: 'weak', answers: {} };
             showQuestion();
         }
 
@@ -805,23 +823,76 @@
                 return;
             }
 
-            quiz = { pool, current: 0, correct: 0, mistakes: [] };
+            const startTime = mode === '140' ? Date.now() : null;
+            const endTime = mode === '140' ? Date.now() + (210 * 60 * 1000) : null; // 210 minutes
+            quiz = { pool, current: 0, correct: 0, wrong: 0, skipped: 0, mistakes: [], mode, startTime, endTime, answers: {} };
             showQuestion();
+        }
+
+        function formatTime(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimer() {
+            if (!quiz || !quiz.endTime) return;
+            const remaining = quiz.endTime - Date.now();
+            const timerEl = document.getElementById('timer');
+            if (timerEl) {
+                timerEl.textContent = formatTime(remaining);
+                timerEl.className = 'timer';
+                if (remaining < 10 * 60 * 1000) timerEl.className = 'timer danger'; // < 10 min
+                else if (remaining < 30 * 60 * 1000) timerEl.className = 'timer warning'; // < 30 min
+            }
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                alert('Tempo scaduto! Il quiz verrà terminato.');
+                finishSSMQuiz();
+            }
         }
 
         function showQuestion() {
             const idx = quiz.pool[quiz.current];
             const q = questions[idx];
-            const opts = shuffle(q.risposte.slice());
             const total = quiz.pool.length;
             const progress = ((quiz.current + 1) / total * 100).toFixed(0);
+            const isSSM = quiz.mode === '140';
+
+            // For SSM, use stored order or create new shuffled order
+            if (!quiz.questionOptions) quiz.questionOptions = {};
+            if (!quiz.questionOptions[idx]) {
+                quiz.questionOptions[idx] = shuffle(q.risposte.slice());
+            }
+            const opts = isSSM ? quiz.questionOptions[idx] : shuffle(q.risposte.slice());
+
+            // Get previously selected answer for this question (SSM mode)
+            const previousAnswer = quiz.answers ? quiz.answers[idx] : null;
+
+            // Count answered questions for SSM
+            const answeredCount = quiz.answers ? Object.keys(quiz.answers).length : 0;
+
+            // Start timer for SSM
+            if (isSSM && !timerInterval) {
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            const statsHtml = isSSM
+                ? `<span>${quiz.current + 1} / ${total}</span> · <span>${answeredCount} risposte date</span>`
+                : `<span>${quiz.current + 1} / ${total}</span> · <span>${quiz.correct} corrette</span>`;
 
             render(`
                 <header>
-                    <h1>SSM Simulator <span class="materia-tag">${q.materia}</span></h1>
-                    <div class="stats">
-                        <span>${quiz.current + 1} / ${total}</span> · <span>${quiz.correct} corrette</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <h1>SSM Simulator <span class="materia-tag">${q.materia}</span></h1>
+                        ${isSSM ? `<div id="timer" class="timer">${formatTime(quiz.endTime - Date.now())}</div>` : ''}
                     </div>
+                    <div class="stats">${statsHtml}</div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
                 </header>
                 <div class="question-card">
@@ -829,7 +900,7 @@
                     <div class="question-text">${q.domanda}</div>
                     ${q.has_image && q.image_src ? `<div class="question-image"><img src="${q.image_src}" alt="Immagine domanda" onclick="openModal(this.src)"></div>` : ''}
                     <div class="options" id="options">
-                        ${opts.map(o => `<button class="option" data-id="${o.id}" data-correct="${o.isCorrect}">${o.text}</button>`).join('')}
+                        ${opts.map(o => `<button class="option ${previousAnswer === o.id ? 'selected' : ''}" data-id="${o.id}" data-correct="${o.isCorrect}">${o.text}</button>`).join('')}
                     </div>
                     <div class="feedback" id="feedback"></div>
                     <div class="commento" id="commento"></div>
@@ -839,15 +910,184 @@
                     <img id="modal-img" src="" alt="Immagine ingrandita">
                 </div>
                 <div class="actions">
-                    <button class="btn btn-primary hidden" id="next-btn">${quiz.current < total - 1 ? 'Prossima' : 'Risultati'}</button>
-                    <button class="btn btn-secondary" id="quit-btn">Esci</button>
+                    ${isSSM ? `
+                        <button class="btn btn-secondary" id="prev-btn" ${quiz.current === 0 ? 'disabled' : ''}>← Precedente</button>
+                        <button class="btn btn-secondary" id="next-btn">${quiz.current < total - 1 ? 'Successiva →' : 'Vai ai risultati'}</button>
+                        <button class="btn btn-primary" id="submit-btn">Termina esame</button>
+                        <button class="btn btn-danger btn-small" id="quit-btn" style="margin-left:auto;">Abbandona</button>
+                    ` : `
+                        <button class="btn btn-primary hidden" id="next-btn">${quiz.current < total - 1 ? 'Prossima' : 'Risultati'}</button>
+                        <button class="btn btn-secondary" id="quit-btn">Esci</button>
+                    `}
                 </div>
+                ${isSSM ? `
+                <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">
+                    ${quiz.pool.map((_, i) => {
+                        const isAnswered = quiz.answers && quiz.answers[quiz.pool[i]] !== undefined;
+                        const isCurrent = i === quiz.current;
+                        return `<button class="question-nav-btn ${isCurrent ? 'current' : ''} ${isAnswered ? 'answered' : ''}" data-index="${i}">${i + 1}</button>`;
+                    }).join('')}
+                </div>
+                ` : ''}
             `);
 
+            // Event listeners
             document.querySelectorAll('.option').forEach(btn => {
-                btn.addEventListener('click', () => handleAnswer(btn, idx, q));
+                btn.addEventListener('click', () => {
+                    if (isSSM) {
+                        handleSSMAnswer(btn, idx);
+                    } else {
+                        handleAnswer(btn, idx, q);
+                    }
+                });
             });
-            document.getElementById('quit-btn').addEventListener('click', showStart);
+
+            if (isSSM) {
+                document.getElementById('prev-btn')?.addEventListener('click', () => {
+                    if (quiz.current > 0) { quiz.current--; showQuestion(); }
+                });
+                document.getElementById('next-btn')?.addEventListener('click', () => {
+                    if (quiz.current < total - 1) { quiz.current++; showQuestion(); }
+                    else { document.getElementById('submit-btn').click(); }
+                });
+                document.getElementById('submit-btn')?.addEventListener('click', () => {
+                    const unanswered = total - Object.keys(quiz.answers || {}).length;
+                    if (unanswered > 0) {
+                        if (confirm(`Hai ${unanswered} domande senza risposta. Vuoi terminare comunque?`)) {
+                            finishSSMQuiz();
+                        }
+                    } else {
+                        finishSSMQuiz();
+                    }
+                });
+                document.getElementById('quit-btn')?.addEventListener('click', () => {
+                    if (confirm('Sei sicuro di voler abbandonare? I tuoi progressi andranno persi.')) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        showStart();
+                    }
+                });
+                document.querySelectorAll('.question-nav-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        quiz.current = parseInt(btn.dataset.index);
+                        showQuestion();
+                    });
+                });
+            } else {
+                document.getElementById('quit-btn')?.addEventListener('click', showStart);
+            }
+        }
+
+        function handleSSMAnswer(btn, qIdx) {
+            // Just select/deselect, no feedback
+            const selectedId = parseInt(btn.dataset.id);
+
+            // If clicking same answer, deselect it
+            if (quiz.answers[qIdx] === selectedId) {
+                delete quiz.answers[qIdx];
+            } else {
+                quiz.answers[qIdx] = selectedId;
+            }
+
+            // Update UI
+            document.querySelectorAll('.option').forEach(b => {
+                b.classList.remove('selected');
+                if (parseInt(b.dataset.id) === quiz.answers[qIdx]) {
+                    b.classList.add('selected');
+                }
+            });
+
+            // Update answered count in header
+            const answeredCount = Object.keys(quiz.answers).length;
+            const statsEl = document.querySelector('.stats');
+            if (statsEl) {
+                statsEl.innerHTML = `<span>${quiz.current + 1} / ${quiz.pool.length}</span> · <span>${answeredCount} risposte date</span>`;
+            }
+
+            // Update nav buttons
+            document.querySelectorAll('.question-nav-btn').forEach(navBtn => {
+                const i = parseInt(navBtn.dataset.index);
+                const isAnswered = quiz.answers[quiz.pool[i]] !== undefined;
+                navBtn.classList.toggle('answered', isAnswered);
+            });
+        }
+
+        function finishSSMQuiz() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+
+            // Calculate results
+            quiz.pool.forEach((qIdx, i) => {
+                const q = questions[qIdx];
+                const answer = quiz.answers[qIdx];
+
+                if (answer === undefined) {
+                    quiz.skipped++;
+                } else {
+                    const selectedOption = q.risposte.find(r => r.id === answer);
+                    if (selectedOption && selectedOption.isCorrect) {
+                        quiz.correct++;
+                    } else {
+                        quiz.wrong++;
+                        quiz.mistakes.push({
+                            domanda: q.domanda,
+                            materia: q.materia,
+                            argomento: q.argomenti,
+                            tua: selectedOption ? selectedOption.text : 'N/A',
+                            corretta: q.risposta_corretta_text,
+                            commento: q.commento,
+                            has_image: q.has_image,
+                            image_src: q.image_src
+                        });
+                        if (!wrongIds.includes(qIdx)) { wrongIds.push(qIdx); saveWrong(); }
+                    }
+
+                    // Record stats for answered questions
+                    const isCorrect = selectedOption && selectedOption.isCorrect;
+                    recordAnswer(q.materia, q.argomenti, isCorrect);
+                }
+            });
+
+            showResults();
+        }
+
+        function handleSkip(qIdx, q) {
+            quiz.skipped++;
+
+            // Hide skip button, show next
+            const skipBtn = document.getElementById('skip-btn');
+            if (skipBtn) skipBtn.classList.add('hidden');
+
+            const feedback = document.getElementById('feedback');
+            feedback.classList.add('visible');
+            feedback.style.background = '#f5f5f5';
+            feedback.style.color = '#666';
+            feedback.textContent = 'Domanda saltata (0 punti)';
+
+            // Show correct answer
+            document.querySelectorAll('.option').forEach(b => {
+                b.classList.add('disabled');
+                if (b.dataset.correct === 'true') {
+                    b.classList.add('show-correct');
+                }
+            });
+
+            if (q.commento) {
+                const commento = document.getElementById('commento');
+                commento.classList.add('visible');
+                commento.innerHTML = '<strong>Spiegazione:</strong> ' + q.commento;
+            }
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.remove('hidden');
+            nextBtn.addEventListener('click', () => {
+                if (quiz.current < quiz.pool.length - 1) {
+                    quiz.current++;
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            });
         }
 
         function handleAnswer(btn, qIdx, q) {
@@ -858,6 +1098,10 @@
 
             // Record stats
             recordAnswer(q.materia, q.argomenti, isCorrect);
+
+            // Hide skip button if present
+            const skipBtn = document.getElementById('skip-btn');
+            if (skipBtn) skipBtn.classList.add('hidden');
 
             document.querySelectorAll('.option').forEach(b => {
                 b.classList.add('disabled');
@@ -873,6 +1117,7 @@
                 if (wIdx > -1) { wrongIds.splice(wIdx, 1); saveWrong(); }
             } else {
                 btn.classList.add('wrong');
+                quiz.wrong++;
                 quiz.mistakes.push({
                     domanda: q.domanda,
                     materia: q.materia,
@@ -888,7 +1133,14 @@
 
             const feedback = document.getElementById('feedback');
             feedback.classList.add('visible', isCorrect ? 'correct' : 'wrong');
-            feedback.textContent = isCorrect ? 'Corretto!' : 'Sbagliato. ' + q.risposta_corretta_text;
+            const isSSM = quiz.mode === '140';
+            if (isCorrect) {
+                feedback.textContent = isSSM ? 'Corretto! (+1 punto)' : 'Corretto!';
+            } else {
+                feedback.textContent = isSSM
+                    ? `Sbagliato (-0.25 punti). ${q.risposta_corretta_text}`
+                    : `Sbagliato. ${q.risposta_corretta_text}`;
+            }
 
             if (q.commento) {
                 const commento = document.getElementById('commento');
@@ -910,8 +1162,12 @@
 
         function showResults() {
             const total = quiz.pool.length;
+            const isSSM = quiz.mode === '140';
+
+            // SSM scoring: +1 correct, -0.25 wrong, 0 skipped
+            const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
+            const maxScore = total; // Max possible is all correct
             const pct = Math.round(quiz.correct / total * 100);
-            const wrong = total - quiz.correct;
 
             let reviewHtml = '';
             if (quiz.mistakes.length > 0) {
@@ -932,17 +1188,28 @@
                 `;
             }
 
+            const scoreDisplay = isSSM
+                ? `<div class="score">${ssmScore.toFixed(2)}</div><div class="score-label">Punteggio SSM su ${maxScore}</div>`
+                : `<div class="score">${pct}%</div><div class="score-label">Punteggio finale</div>`;
+
+            const breakdownHtml = isSSM
+                ? `<div class="results-breakdown">
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#22863a;">+${quiz.correct}</div><div class="breakdown-label">Corrette (+1)</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#cb2431;">${quiz.wrong > 0 ? '-' + (quiz.wrong * 0.25).toFixed(2) : '0'}</div><div class="breakdown-label">Errate (-0.25)</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#888;">${quiz.skipped}</div><div class="breakdown-label">Omesse (0)</div></div>
+                    </div>`
+                : `<div class="results-breakdown">
+                        <div class="breakdown-item"><div class="breakdown-value">${quiz.correct}</div><div class="breakdown-label">Corrette</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value">${quiz.wrong}</div><div class="breakdown-label">Errate</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value">${total}</div><div class="breakdown-label">Totali</div></div>
+                    </div>`;
+
             render(`
                 ${getAuthHeaderHtml()}
                 <div class="results">
-                    <h2>Risultati</h2>
-                    <div class="score">${pct}%</div>
-                    <div class="score-label">Punteggio finale</div>
-                    <div class="results-breakdown">
-                        <div class="breakdown-item"><div class="breakdown-value">${quiz.correct}</div><div class="breakdown-label">Corrette</div></div>
-                        <div class="breakdown-item"><div class="breakdown-value">${wrong}</div><div class="breakdown-label">Errate</div></div>
-                        <div class="breakdown-item"><div class="breakdown-value">${total}</div><div class="breakdown-label">Totali</div></div>
-                    </div>
+                    <h2>Risultati${isSSM ? ' Simulazione SSM' : ''}</h2>
+                    ${scoreDisplay}
+                    ${breakdownHtml}
                     <div class="actions" style="justify-content:center;">
                         <button class="btn btn-primary" id="restart-btn">Nuovo quiz</button>
                         <button class="btn btn-secondary" id="stats-btn">Statistiche</button>
