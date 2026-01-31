@@ -142,6 +142,28 @@
         .question-nav-btn.answered { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
         .question-nav-btn.answered.current { background: #0969da; border-color: #0969da; }
 
+        /* Simulation history styles */
+        .simulations-section { margin-top: 24px; }
+        .simulations-section h3 { font-size: 1rem; margin-bottom: 16px; }
+        .simulation-cards { display: flex; flex-direction: column; gap: 12px; }
+        .simulation-card { background: #fff; border-radius: 8px; padding: 16px; border: 1px solid #e0e0e0; cursor: pointer; transition: all 0.15s; }
+        .simulation-card:hover { border-color: #999; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .simulation-card.expanded { border-color: #0969da; }
+        .simulation-header { display: flex; justify-content: space-between; align-items: center; }
+        .simulation-date { font-size: 0.875rem; color: #666; }
+        .simulation-score { font-size: 1.25rem; font-weight: 700; }
+        .simulation-score.good { color: #22863a; }
+        .simulation-score.medium { color: #dbab09; }
+        .simulation-score.bad { color: #cb2431; }
+        .simulation-stats { display: flex; gap: 16px; margin-top: 8px; font-size: 0.8125rem; color: #666; }
+        .simulation-details { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; display: none; }
+        .simulation-card.expanded .simulation-details { display: block; }
+        .simulation-breakdown { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .breakdown-row { display: flex; justify-content: space-between; font-size: 0.8125rem; padding: 4px 0; }
+        .breakdown-row .materia-name { color: #666; }
+        .breakdown-row .materia-score { font-weight: 500; }
+        .no-simulations { text-align: center; padding: 32px; color: #888; font-size: 0.875rem; }
+
         /* Auth styles */
         .auth-header { display: flex; justify-content: flex-end; padding: 12px 0; margin-bottom: 8px; }
         .auth-btn { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; cursor: pointer; font-size: 0.875rem; transition: all 0.15s ease; }
@@ -189,6 +211,9 @@
 
         const STORAGE_KEY = 'quiz_ssm_wrong';
         const STATS_KEY = 'quiz_ssm_stats';
+        const SIMULATIONS_KEY = 'quiz_ssm_simulations';
+
+        let simulations = [];
 
         // Supabase configuration
         const SUPABASE_URL = 'https://obckabzhhzcpxajaxxjo.supabase.co';
@@ -250,7 +275,7 @@
             try {
                 const { data, error } = await supabase
                     .from('user_progress')
-                    .select('stats_data, wrong_ids')
+                    .select('stats_data, wrong_ids, simulations')
                     .eq('user_id', currentUser.id)
                     .single();
 
@@ -262,12 +287,15 @@
                     // Merge cloud data with local
                     const cloudStats = data.stats_data || { materie: {}, argomenti: {} };
                     const cloudWrong = data.wrong_ids || [];
+                    const cloudSimulations = data.simulations || [];
 
                     statsData = mergeStats(statsData, cloudStats);
                     wrongIds = mergeWrongIds(wrongIds, cloudWrong);
+                    simulations = mergeSimulations(simulations, cloudSimulations);
 
                     saveStats();
                     saveWrong();
+                    localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
                 }
 
                 // Push merged data back to cloud
@@ -291,6 +319,7 @@
                         user_id: currentUser.id,
                         stats_data: statsData,
                         wrong_ids: wrongIds,
+                        simulations: simulations,
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'user_id' });
 
@@ -348,6 +377,19 @@
 
         function mergeWrongIds(local, cloud) {
             return [...new Set([...local, ...cloud])];
+        }
+
+        function mergeSimulations(local, cloud) {
+            // Merge by id, keeping unique simulations, sorted by date descending
+            const byId = new Map();
+            [...local, ...cloud].forEach(sim => {
+                if (!byId.has(sim.id)) {
+                    byId.set(sim.id, sim);
+                }
+            });
+            return Array.from(byId.values())
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 50); // Keep max 50
         }
 
         function updateSyncIndicator() {
@@ -409,6 +451,25 @@
         function saveStats() {
             localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
             debouncedSync();
+        }
+
+        function loadSimulations() {
+            try {
+                simulations = JSON.parse(localStorage.getItem(SIMULATIONS_KEY)) || [];
+            } catch(e) {
+                simulations = [];
+            }
+        }
+
+        function saveSimulations() {
+            localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
+            debouncedSync();
+        }
+
+        function addSimulation(result) {
+            simulations.unshift(result); // Add to beginning (most recent first)
+            if (simulations.length > 50) simulations = simulations.slice(0, 50); // Keep max 50
+            saveSimulations();
         }
 
         function recordAnswer(materia, argomento, isCorrect) {
@@ -489,9 +550,10 @@
             }
             loadWrong();
             loadStats();
+            loadSimulations();
             const wrongDisabled = wrongIds.length === 0 ? 'disabled' : '';
             const weakAreas = getWeakAreas();
-            const hasStats = Object.keys(statsData.materie).length > 0;
+            const hasStats = Object.keys(statsData.materie).length > 0 || simulations.length > 0;
 
             render(`
                 ${getAuthHeaderHtml()}
@@ -501,7 +563,7 @@
                     <div class="mode-select">
                         <div class="mode-option selected" data-mode="140">
                             <strong>Simulazione SSM</strong>
-                            <span>140 domande come nel concorso</span>
+                            <span>140 domande, 210 min${simulations.length > 0 ? ` · ${simulations.length} completate` : ''}</span>
                         </div>
                         <div class="mode-option" data-mode="20">
                             <strong>Esercitazione rapida</strong>
@@ -556,10 +618,16 @@
 
         function showStats() {
             loadStats();
+            loadSimulations();
             const totalAnswered = Object.values(statsData.materie).reduce((sum, m) => sum + m.total, 0);
             const totalCorrect = Object.values(statsData.materie).reduce((sum, m) => sum + m.correct, 0);
             const overallPct = totalAnswered > 0 ? Math.round(totalCorrect / totalAnswered * 100) : 0;
             const weakAreas = getWeakAreas();
+
+            // Simulation stats
+            const avgSimScore = simulations.length > 0
+                ? (simulations.reduce((sum, s) => sum + s.score, 0) / simulations.length).toFixed(1)
+                : 0;
 
             // Sort materie by percentage (ascending = worst first)
             const materieStats = Object.entries(statsData.materie)
@@ -670,11 +738,59 @@
                     ${weakHtml}
                     ${materieHtml}
 
-                    ${totalAnswered === 0 ? '<div class="no-stats">Nessuna statistica ancora. Inizia un quiz!</div>' : ''}
+                    <div class="simulations-section">
+                        <h3>Cronologia Simulazioni SSM (${simulations.length})</h3>
+                        ${simulations.length > 0 ? `
+                            <div style="margin-bottom:16px;padding:12px;background:#f5f5f5;border-radius:6px;display:flex;justify-content:space-around;text-align:center;">
+                                <div><div style="font-size:1.25rem;font-weight:600;">${simulations.length}</div><div style="font-size:0.75rem;color:#666;">Simulazioni</div></div>
+                                <div><div style="font-size:1.25rem;font-weight:600;">${avgSimScore}</div><div style="font-size:0.75rem;color:#666;">Media punti</div></div>
+                                <div><div style="font-size:1.25rem;font-weight:600;">${Math.max(...simulations.map(s => s.score)).toFixed(1)}</div><div style="font-size:0.75rem;color:#666;">Miglior punteggio</div></div>
+                            </div>
+                            <div class="simulation-cards">
+                                ${simulations.map((sim, idx) => {
+                                    const scoreClass = sim.score >= 100 ? 'good' : sim.score >= 70 ? 'medium' : 'bad';
+                                    const dateStr = new Date(sim.date).toLocaleDateString('it-IT', {
+                                        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                                    });
+                                    return `
+                                        <div class="simulation-card" data-sim-index="${idx}">
+                                            <div class="simulation-header">
+                                                <span class="simulation-date">${dateStr}</span>
+                                                <span class="simulation-score ${scoreClass}">${sim.score.toFixed(2)} / ${sim.total}</span>
+                                            </div>
+                                            <div class="simulation-stats">
+                                                <span>✓ ${sim.correct} corrette</span>
+                                                <span>✗ ${sim.wrong} errate</span>
+                                                <span>○ ${sim.skipped} omesse</span>
+                                                <span>⏱ ${sim.duration} min</span>
+                                            </div>
+                                            <div class="simulation-details">
+                                                <div style="font-size:0.8125rem;font-weight:500;margin-bottom:8px;">Dettaglio per materia:</div>
+                                                <div class="simulation-breakdown">
+                                                    ${sim.subjectBreakdown ? Object.entries(sim.subjectBreakdown)
+                                                        .sort((a, b) => (b[1].correct - b[1].wrong * 0.25) - (a[1].correct - a[1].wrong * 0.25))
+                                                        .map(([materia, data]) => {
+                                                            const matScore = data.correct - data.wrong * 0.25;
+                                                            const matTotal = data.correct + data.wrong + data.skipped;
+                                                            return `<div class="breakdown-row">
+                                                                <span class="materia-name">${materia}</span>
+                                                                <span class="materia-score">${matScore.toFixed(1)}/${matTotal}</span>
+                                                            </div>`;
+                                                        }).join('') : '<div style="color:#888;font-size:0.8125rem;">Dettaglio non disponibile</div>'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : '<div class="no-simulations">Nessuna simulazione completata. Prova una Simulazione SSM!</div>'}
+                    </div>
+
+                    ${totalAnswered === 0 && simulations.length === 0 ? '<div class="no-stats">Nessuna statistica ancora. Inizia un quiz!</div>' : ''}
 
                     <div class="actions" style="justify-content:center;margin-top:24px;">
                         <button class="btn btn-secondary" id="back-btn">Torna al menu</button>
-                        ${totalAnswered > 0 ? '<button class="btn btn-danger btn-small" id="reset-stats-btn">Azzera statistiche</button>' : ''}
+                        ${totalAnswered > 0 || simulations.length > 0 ? '<button class="btn btn-danger btn-small" id="reset-stats-btn">Azzera tutto</button>' : ''}
                     </div>
                 </div>
             `);
@@ -684,13 +800,22 @@
             const resetBtn = document.getElementById('reset-stats-btn');
             if (resetBtn) {
                 resetBtn.addEventListener('click', () => {
-                    if (confirm('Sei sicuro di voler azzerare tutte le statistiche?')) {
+                    if (confirm('Sei sicuro di voler azzerare tutte le statistiche e la cronologia delle simulazioni?')) {
                         statsData = { materie: {}, argomenti: {} };
+                        simulations = [];
                         saveStats();
+                        saveSimulations();
                         showStats();
                     }
                 });
             }
+
+            // Simulation card expand/collapse
+            document.querySelectorAll('.simulation-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('expanded');
+                });
+            });
 
             const practiceWeakBtn = document.getElementById('practice-weak-btn');
             if (practiceWeakBtn) {
@@ -801,10 +926,79 @@
             });
         }
 
+        // SSM 2024 distribution - maps actual materia names to question count
+        const SSM_DISTRIBUTION = {
+            'Cardiologia e Chirurgia Cardiovascolare': 14,
+            'Chirurgia Generale': 10,
+            'Ginecologia': 9,
+            'Anestesia': 9,
+            'Neurologia e Neurochirurgia': 7,
+            'Pediatria': 7,
+            'Ortopedia': 7,
+            'Pneumologia e Chirurgia Toracica': 6,
+            'Dermatologia': 6,
+            'Endocrinologia e Nutrizione': 5,
+            'Malattie Infettive e Microbiologia': 5,
+            'Radiologia': 5,
+            'Statistica, Epidemiologia e Sanità Pubblica': 5,
+            'Reumatologia': 5,
+            'Urologia': 5,
+            'Otorinolaringoiatria': 5,
+            'Ematologia': 4,
+            'Oncologia': 3,
+            'Nefrologia': 3,
+            'Psichiatria': 3,
+            'Oftalmologia': 2,
+            'Medicina del Lavoro': 2,
+            'Medicina legale': 2,
+            // Extra subjects to reach 140 (not in official SSM but in our database)
+            'Immunologia': 4,
+            'Genetica': 4,
+            'Scienze di base': 3
+        };
+        // Total: 134 (SSM official) + 11 (extra) = 140 (adjusted to match, original SSM had some missing)
+
+        function selectSSMQuestions() {
+            const selected = [];
+            const usedIndices = new Set();
+
+            // For each materia in distribution, select random questions
+            Object.entries(SSM_DISTRIBUTION).forEach(([materia, count]) => {
+                // Find all questions for this materia
+                const materiaQuestions = questions
+                    .map((q, i) => ({ q, i }))
+                    .filter(({ q, i }) => q.materia === materia && !usedIndices.has(i));
+
+                // Shuffle and take up to 'count' questions
+                const shuffled = shuffle(materiaQuestions);
+                const toTake = Math.min(count, shuffled.length);
+
+                for (let j = 0; j < toTake; j++) {
+                    selected.push(shuffled[j].i);
+                    usedIndices.add(shuffled[j].i);
+                }
+            });
+
+            // If we don't have 140, fill with random questions from any subject
+            if (selected.length < 140) {
+                const remaining = questions
+                    .map((q, i) => i)
+                    .filter(i => !usedIndices.has(i));
+                const shuffledRemaining = shuffle(remaining);
+                const needed = 140 - selected.length;
+                for (let j = 0; j < Math.min(needed, shuffledRemaining.length); j++) {
+                    selected.push(shuffledRemaining[j]);
+                }
+            }
+
+            // Shuffle final selection so materie are mixed
+            return shuffle(selected);
+        }
+
         function startQuiz(mode, customNum = 0, customMaterie = []) {
             let pool;
             if (mode === '140') {
-                pool = shuffle(questions.map((q, i) => i)).slice(0, 140);
+                pool = selectSSMQuestions();
             } else if (mode === '20') {
                 pool = shuffle(questions.map((q, i) => i)).slice(0, 20);
             } else if (mode === 'wrong') {
@@ -1016,19 +1210,30 @@
             clearInterval(timerInterval);
             timerInterval = null;
 
+            // Calculate subject breakdown
+            const subjectBreakdown = {};
+
             // Calculate results
             quiz.pool.forEach((qIdx, i) => {
                 const q = questions[qIdx];
                 const answer = quiz.answers[qIdx];
 
+                // Initialize subject breakdown
+                if (!subjectBreakdown[q.materia]) {
+                    subjectBreakdown[q.materia] = { correct: 0, wrong: 0, skipped: 0 };
+                }
+
                 if (answer === undefined) {
                     quiz.skipped++;
+                    subjectBreakdown[q.materia].skipped++;
                 } else {
                     const selectedOption = q.risposte.find(r => r.id === answer);
                     if (selectedOption && selectedOption.isCorrect) {
                         quiz.correct++;
+                        subjectBreakdown[q.materia].correct++;
                     } else {
                         quiz.wrong++;
+                        subjectBreakdown[q.materia].wrong++;
                         quiz.mistakes.push({
                             domanda: q.domanda,
                             materia: q.materia,
@@ -1047,6 +1252,25 @@
                     recordAnswer(q.materia, q.argomenti, isCorrect);
                 }
             });
+
+            // Calculate duration
+            const durationMs = Date.now() - quiz.startTime;
+            const durationMin = Math.round(durationMs / 60000);
+
+            // Save simulation result
+            const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
+            const simulationResult = {
+                id: quiz.startTime, // Use start time as unique ID
+                date: new Date(quiz.startTime).toISOString(),
+                score: ssmScore,
+                correct: quiz.correct,
+                wrong: quiz.wrong,
+                skipped: quiz.skipped,
+                total: quiz.pool.length,
+                duration: durationMin,
+                subjectBreakdown: subjectBreakdown
+            };
+            addSimulation(simulationResult);
 
             showResults();
         }
