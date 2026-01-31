@@ -305,7 +305,7 @@
             try {
                 const { data, error } = await supabase
                     .from('user_progress')
-                    .select('stats_data, wrong_ids, simulations')
+                    .select('*')
                     .eq('user_id', currentUser.id)
                     .single();
 
@@ -314,7 +314,7 @@
                 }
 
                 if (data) {
-                    // Merge cloud data with local
+                    // Merge cloud data with local (handle missing columns gracefully)
                     const cloudStats = data.stats_data || { materie: {}, argomenti: {} };
                     const cloudWrong = data.wrong_ids || [];
                     const cloudSimulations = data.simulations || [];
@@ -325,8 +325,9 @@
                     simulations = mergeSimulations(simulations, cloudSimulations);
                     projectionHistory = mergeProjectionHistory(projectionHistory, cloudProjectionHistory);
 
-                    saveStats();
-                    saveWrong();
+                    // Save to localStorage (don't trigger sync again)
+                    localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
                     localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
                     localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
                 }
@@ -346,6 +347,7 @@
             if (!currentUser) return;
 
             try {
+                // Try full sync first
                 const { error } = await supabase
                     .from('user_progress')
                     .upsert({
@@ -357,7 +359,20 @@
                         updated_at: new Date().toISOString()
                     }, { onConflict: 'user_id' });
 
-                if (error) throw error;
+                if (error) {
+                    // If error (possibly missing columns), try basic sync
+                    console.warn('Full sync failed, trying basic sync:', error.message);
+                    const { error: basicError } = await supabase
+                        .from('user_progress')
+                        .upsert({
+                            user_id: currentUser.id,
+                            stats_data: statsData,
+                            wrong_ids: wrongIds,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' });
+
+                    if (basicError) throw basicError;
+                }
                 syncStatus = 'synced';
             } catch (err) {
                 console.error('Sync to cloud error:', err);
@@ -1027,21 +1042,7 @@
 
                         // Immediate sync to cloud (not debounced)
                         if (currentUser) {
-                            try {
-                                await supabase
-                                    .from('user_progress')
-                                    .upsert({
-                                        user_id: currentUser.id,
-                                        stats_data: statsData,
-                                        wrong_ids: wrongIds,
-                                        simulations: simulations,
-                                        projection_history: projectionHistory,
-                                        updated_at: new Date().toISOString()
-                                    }, { onConflict: 'user_id' });
-                                syncStatus = 'synced';
-                            } catch (err) {
-                                console.error('Reset sync error:', err);
-                            }
+                            await syncToCloud();
                         }
 
                         showStats();
