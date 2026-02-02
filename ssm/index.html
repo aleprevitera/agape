@@ -305,6 +305,7 @@
         let sharedSession = null;      // Current shared session data
         let sessionChannel = null;     // Supabase Realtime channel
         let sessionParticipants = [];  // List of participants
+        let lobbyPollInterval = null;  // Fallback polling for lobby updates
 
         // Auth functions
         async function checkAuthorization(email) {
@@ -1075,6 +1076,12 @@
                 return;
             }
 
+            // Clear any existing poll
+            if (lobbyPollInterval) {
+                clearInterval(lobbyPollInterval);
+                lobbyPollInterval = null;
+            }
+
             // Subscribe to realtime updates
             subscribeToSession(sharedSession.id);
 
@@ -1082,6 +1089,38 @@
             await refreshParticipants();
 
             renderLobby(isHost);
+
+            // Start polling as fallback (every 3 seconds)
+            lobbyPollInterval = setInterval(async () => {
+                if (!sharedSession || sharedSession.status !== 'waiting') {
+                    clearInterval(lobbyPollInterval);
+                    lobbyPollInterval = null;
+                    return;
+                }
+
+                // Check for session status changes
+                const { data: sessionData } = await supabase
+                    .from('shared_sessions')
+                    .select('status, started_at')
+                    .eq('id', sharedSession.id)
+                    .single();
+
+                if (sessionData && sessionData.status === 'active' && sharedSession.status === 'waiting') {
+                    sharedSession.status = 'active';
+                    sharedSession.started_at = sessionData.started_at;
+                    clearInterval(lobbyPollInterval);
+                    lobbyPollInterval = null;
+                    startSharedQuiz();
+                    return;
+                }
+
+                // Refresh participants
+                const prevCount = sessionParticipants.length;
+                await refreshParticipants();
+                if (sessionParticipants.length !== prevCount) {
+                    renderLobby(sharedSession.created_by === currentUser.id);
+                }
+            }, 3000);
         }
 
         async function refreshParticipants() {
@@ -1176,12 +1215,16 @@
             // Clean up existing subscription
             if (sessionChannel) {
                 supabase.removeChannel(sessionChannel);
+                sessionChannel = null;
             }
+
+            console.log('Subscribing to session:', sessionId);
 
             sessionChannel = supabase.channel(`session-${sessionId}`)
                 .on('postgres_changes',
                     { event: '*', schema: 'public', table: 'session_participants', filter: `session_id=eq.${sessionId}` },
                     async (payload) => {
+                        console.log('Participant change received:', payload);
                         await refreshParticipants();
                         // Re-render lobby if still in lobby
                         if (sharedSession && sharedSession.status === 'waiting') {
@@ -1197,6 +1240,7 @@
                 .on('postgres_changes',
                     { event: 'UPDATE', schema: 'public', table: 'shared_sessions', filter: `id=eq.${sessionId}` },
                     (payload) => {
+                        console.log('Session change received:', payload);
                         const newStatus = payload.new.status;
                         if (newStatus === 'active' && sharedSession.status === 'waiting') {
                             sharedSession = payload.new;
@@ -1207,10 +1251,23 @@
                             sharedSession = payload.new;
                         }
                     })
-                .subscribe();
+                .subscribe((status, err) => {
+                    console.log('Realtime subscription status:', status, err);
+                    if (status === 'SUBSCRIBED') {
+                        console.log('Successfully subscribed to realtime updates');
+                    } else if (status === 'CHANNEL_ERROR') {
+                        console.error('Realtime channel error:', err);
+                    }
+                });
         }
 
         async function leaveSession() {
+            // Stop polling
+            if (lobbyPollInterval) {
+                clearInterval(lobbyPollInterval);
+                lobbyPollInterval = null;
+            }
+
             if (sharedSession && currentUser) {
                 await supabase
                     .from('session_participants')
@@ -1252,6 +1309,12 @@
 
         function startSharedQuiz() {
             if (!sharedSession) return;
+
+            // Stop lobby polling
+            if (lobbyPollInterval) {
+                clearInterval(lobbyPollInterval);
+                lobbyPollInterval = null;
+            }
 
             // Clear any running timer
             if (timerInterval) {

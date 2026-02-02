@@ -67,8 +67,21 @@ CREATE POLICY "Users can leave sessions" ON session_participants
   FOR DELETE USING (auth.uid() = user_id);
 
 -- Abilita Realtime per le tabelle
-ALTER PUBLICATION supabase_realtime ADD TABLE shared_sessions;
-ALTER PUBLICATION supabase_realtime ADD TABLE session_participants;
+-- NOTA: Se ricevi un errore "relation already exists", ignora e prosegui
+-- Puoi anche abilitare Realtime dalla Dashboard: Database > Replication > supabase_realtime > Seleziona le tabelle
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE shared_sessions;
+EXCEPTION WHEN duplicate_object THEN
+    RAISE NOTICE 'shared_sessions already in publication';
+END $$;
+
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE session_participants;
+EXCEPTION WHEN duplicate_object THEN
+    RAISE NOTICE 'session_participants already in publication';
+END $$;
 
 -- Indici per performance
 CREATE INDEX idx_shared_sessions_code ON shared_sessions(code);
