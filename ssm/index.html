@@ -39,11 +39,11 @@
         .commento { margin-top: 12px; padding: 12px 16px; background: #f6f8fa; border-radius: 6px; font-size: 0.875rem; color: #444; display: none; }
         .commento.visible { display: block; }
         .commento strong { color: #1a1a1a; }
-        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; }
-        .btn-primary { background: #1a1a1a; color: #fff; }
-        .btn-primary:hover { background: #333; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .btn-primary:hover { background: linear-gradient(135deg, #333 0%, #444 100%); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
         .btn-secondary { background: #fff; color: #1a1a1a; border: 1px solid #e0e0e0; }
-        .btn-secondary:hover { background: #f5f5f5; }
+        .btn-secondary:hover { background: #f5f5f5; border-color: #ccc; }
         .btn-danger { background: #cb2431; color: #fff; }
         .btn-danger:hover { background: #a51d28; }
         .btn-small { padding: 8px 16px; font-size: 0.8125rem; }
@@ -56,16 +56,33 @@
         .breakdown-item { text-align: center; }
         .breakdown-value { font-size: 1.5rem; font-weight: 600; }
         .breakdown-label { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em; }
-        .start-screen { text-align: center; padding: 48px 24px; }
-        .start-screen h1 { font-size: 2rem; margin-bottom: 8px; }
-        .start-screen .subtitle { color: #666; margin-bottom: 32px; }
-        .mode-select { display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 0 auto 24px; }
-        .mode-option { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; text-align: left; background: #fff; }
-        .mode-option:hover:not(.disabled) { border-color: #999; }
-        .mode-option.selected { border-color: #1a1a1a; background: #f5f5f5; }
+        .start-screen { text-align: center; padding: 32px 24px; }
+        .start-screen h1 { font-size: 1.875rem; margin-bottom: 8px; background: linear-gradient(135deg, #1a1a1a 0%, #444 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .start-screen .subtitle { color: #666; margin-bottom: 28px; font-size: 0.9375rem; }
+        .mode-select { display: flex; flex-direction: column; gap: 8px; max-width: 420px; margin: 0 auto 28px; }
+        .mode-section { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .mode-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 10px; padding-left: 4px; display: flex; align-items: center; gap: 8px; }
+        .mode-section-title::after { content: ''; flex: 1; height: 1px; background: #e0e0e0; }
+        .mode-option { padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; text-align: left; background: #fff; display: flex; align-items: center; gap: 14px; }
+        .mode-option:hover:not(.disabled) { border-color: #bbb; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .mode-option.selected { border-color: #1a1a1a; background: linear-gradient(135deg, #f8f8f8 0%, #fff 100%); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .mode-option.disabled { opacity: 0.4; pointer-events: none; }
-        .mode-option strong { display: block; margin-bottom: 2px; }
-        .mode-option span { font-size: 0.8125rem; color: #666; }
+        .mode-option-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .mode-option-icon svg { width: 24px; height: 24px; }
+        .mode-option-content { flex: 1; min-width: 0; }
+        .mode-option-content strong { display: block; margin-bottom: 2px; font-size: 0.9375rem; }
+        .mode-option-content span { font-size: 0.8125rem; color: #666; display: block; }
+        .mode-option-badge { font-size: 0.6875rem; padding: 3px 8px; border-radius: 10px; font-weight: 600; flex-shrink: 0; }
+        /* Icon backgrounds */
+        .mode-option[data-mode="140"] .mode-option-icon { background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); color: #fff; }
+        .mode-option[data-mode="20"] .mode-option-icon { background: linear-gradient(135deg, #22863a 0%, #2ea043 100%); color: #fff; }
+        .mode-option[data-mode="custom"] .mode-option-icon { background: linear-gradient(135deg, #6f42c1 0%, #8957e5 100%); color: #fff; }
+        .mode-option[data-mode="wrong"] .mode-option-icon { background: linear-gradient(135deg, #dbab09 0%, #f0c000 100%); color: #fff; }
+        .mode-option[data-mode="weak"] .mode-option-icon { background: linear-gradient(135deg, #cb2431 0%, #d73a49 100%); color: #fff; }
+        .mode-option[data-mode="shared-create"] .mode-option-icon { background: linear-gradient(135deg, #0969da 0%, #2188ff 100%); color: #fff; }
+        .mode-option[data-mode="shared-join"] .mode-option-icon { background: linear-gradient(135deg, #0969da 0%, #2188ff 100%); color: #fff; }
+        .mode-option:active:not(.disabled) { transform: scale(0.98); }
+        .btn:active { transform: scale(0.97); }
         .hidden { display: none !important; }
         .review-section { margin-top: 32px; text-align: left; }
         .review-section h3 { font-size: 1rem; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #e0e0e0; }
@@ -211,7 +228,6 @@
         .google-icon { width: 18px; height: 18px; }
 
         /* Shared session styles */
-        .shared-session-card { border: 2px solid #0969da; background: linear-gradient(135deg, #e8f4fd 0%, #fff 100%); }
         .lobby-screen { text-align: center; padding: 24px; }
         .lobby-screen h1 { font-size: 1.75rem; margin-bottom: 8px; }
         .lobby-screen .subtitle { color: #666; margin-bottom: 24px; }
@@ -1582,39 +1598,94 @@
                     <h1>Simulatore SSM</h1>
                     <p class="subtitle">Quiz di preparazione alle Specializzazioni Mediche</p>
                     <div class="mode-select">
-                        <div class="mode-option selected" data-mode="140">
-                            <strong>Simulazione SSM</strong>
-                            <span>140 domande, 210 min${simulations.length > 0 ? ` · ${simulations.length} completate` : ''}</span>
+                        <div class="mode-section">
+                            <div class="mode-section-title">Studio individuale</div>
+                            <div class="mode-option selected" data-mode="140">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="12" y2="10"/><line x1="12" y1="14" x2="12" y2="14"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Simulazione SSM</strong>
+                                    <span>140 domande · 3h 30min</span>
+                                </div>
+                                ${simulations.length > 0 ? `<span class="mode-option-badge" style="background:#e8f4fd;color:#0969da;">${simulations.length} fatte</span>` : ''}
+                            </div>
+                            <div class="mode-option" data-mode="20">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Esercitazione rapida</strong>
+                                    <span>20 domande casuali</span>
+                                </div>
+                            </div>
+                            <div class="mode-option" data-mode="custom">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Personalizzato</strong>
+                                    <span>Scegli materie e numero</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mode-option" data-mode="20">
-                            <strong>Esercitazione rapida</strong>
-                            <span>20 domande casuali</span>
-                        </div>
-                        <div class="mode-option" data-mode="custom">
-                            <strong>Personalizzato</strong>
-                            <span>Scegli materie e numero</span>
-                        </div>
-                        <div class="mode-option ${wrongDisabled}" data-mode="wrong">
-                            <strong>Ripassa errori</strong>
-                            <span>${wrongIds.length} domande da rivedere</span>
-                        </div>
-                        ${weakAreas.length > 0 ? `
-                        <div class="mode-option" data-mode="weak" style="border-color:#cb2431;">
-                            <strong style="color:#cb2431;">Rinforza punti deboli</strong>
-                            <span>${weakAreas.length} aree sotto il 60%</span>
+
+                        ${(wrongIds.length > 0 || weakAreas.length > 0) ? `
+                        <div class="mode-section">
+                            <div class="mode-section-title">Ripasso mirato</div>
+                            ${wrongIds.length > 0 ? `
+                            <div class="mode-option" data-mode="wrong">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Ripassa errori</strong>
+                                    <span>Rivedi le domande sbagliate</span>
+                                </div>
+                                <span class="mode-option-badge" style="background:#fff3cd;color:#856404;">${wrongIds.length}</span>
+                            </div>
+                            ` : ''}
+                            ${weakAreas.length > 0 ? `
+                            <div class="mode-option" data-mode="weak">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Rinforza punti deboli</strong>
+                                    <span>Aree con percentuale bassa</span>
+                                </div>
+                                <span class="mode-option-badge" style="background:#ffeef0;color:#cb2431;">${weakAreas.length}</span>
+                            </div>
+                            ` : ''}
                         </div>
                         ` : ''}
-                        <div class="mode-option shared-session-card" data-mode="shared-create">
-                            <strong style="color:#0969da;">Crea sessione condivisa</strong>
-                            <span>Invita altri a fare lo stesso test</span>
-                        </div>
-                        <div class="mode-option" data-mode="shared-join" style="border-color:#0969da;">
-                            <strong style="color:#0969da;">Unisciti a sessione</strong>
-                            <span>Inserisci il codice di invito</span>
+
+                        <div class="mode-section">
+                            <div class="mode-section-title">Multiplayer</div>
+                            <div class="mode-option" data-mode="shared-create">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Crea sessione condivisa</strong>
+                                    <span>Invita altri a fare lo stesso test</span>
+                                </div>
+                            </div>
+                            <div class="mode-option" data-mode="shared-join">
+                                <div class="mode-option-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                </div>
+                                <div class="mode-option-content">
+                                    <strong>Unisciti a sessione</strong>
+                                    <span>Inserisci il codice di invito</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="start-btn">Inizia</button>
-                    ${hasStats ? `<button class="btn btn-secondary" id="stats-btn" style="margin-left:12px;">Statistiche</button>` : ''}
+                    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary" id="start-btn">Inizia</button>
+                        ${hasStats ? `<button class="btn btn-secondary" id="stats-btn">📊 Statistiche</button>` : ''}
+                    </div>
                     <p style="margin-top:24px;font-size:0.8rem;color:#888;">${questions.length} domande disponibili</p>
                 </div>
             `);
