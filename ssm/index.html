@@ -210,6 +210,50 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .google-icon { width: 18px; height: 18px; }
 
+        /* Shared session styles */
+        .shared-session-card { border: 2px solid #0969da; background: linear-gradient(135deg, #e8f4fd 0%, #fff 100%); }
+        .lobby-screen { text-align: center; padding: 24px; }
+        .lobby-screen h1 { font-size: 1.75rem; margin-bottom: 8px; }
+        .lobby-screen .subtitle { color: #666; margin-bottom: 24px; }
+        .session-code { font-size: 2.5rem; font-weight: 700; letter-spacing: 0.3em; background: #1a1a1a; color: #fff; padding: 16px 32px; border-radius: 12px; display: inline-block; margin: 16px 0; font-family: monospace; }
+        .session-code-label { font-size: 0.875rem; color: #666; margin-bottom: 8px; }
+        .participant-list { background: #fff; border-radius: 8px; padding: 16px; margin: 24px 0; border: 1px solid #e0e0e0; text-align: left; max-height: 300px; overflow-y: auto; }
+        .participant-list h3 { font-size: 0.875rem; color: #666; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .participant-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .participant-item:last-child { border-bottom: none; }
+        .participant-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e8f4fd; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #0969da; font-size: 0.875rem; }
+        .participant-name { flex: 1; font-weight: 500; }
+        .participant-host { font-size: 0.75rem; color: #0969da; background: #e8f4fd; padding: 2px 8px; border-radius: 10px; }
+        .participant-status { font-size: 0.75rem; color: #22863a; }
+        .participant-status.completed { color: #22863a; font-weight: 500; }
+        .participant-status.in-progress { color: #dbab09; }
+        .waiting-animation { display: flex; justify-content: center; gap: 6px; margin: 16px 0; }
+        .waiting-dot { width: 10px; height: 10px; background: #0969da; border-radius: 50%; animation: waitingPulse 1.4s infinite ease-in-out; }
+        .waiting-dot:nth-child(2) { animation-delay: 0.2s; }
+        .waiting-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes waitingPulse { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+        .join-input { font-size: 1.5rem; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; padding: 16px; border: 2px solid #e0e0e0; border-radius: 8px; width: 200px; font-family: monospace; }
+        .join-input:focus { outline: none; border-color: #0969da; }
+        .leaderboard { background: #fff; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #e0e0e0; }
+        .leaderboard h3 { font-size: 1rem; margin-bottom: 16px; text-align: center; }
+        .leaderboard-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; margin-bottom: 8px; }
+        .leaderboard-item:nth-child(1) { background: linear-gradient(135deg, #ffd700 0%, #fff8dc 100%); }
+        .leaderboard-item:nth-child(2) { background: linear-gradient(135deg, #c0c0c0 0%, #f5f5f5 100%); }
+        .leaderboard-item:nth-child(3) { background: linear-gradient(135deg, #cd7f32 0%, #f5e6d3 100%); }
+        .leaderboard-item:nth-child(n+4) { background: #f5f5f5; }
+        .leaderboard-rank { font-size: 1.25rem; font-weight: 700; width: 32px; text-align: center; }
+        .leaderboard-user { flex: 1; }
+        .leaderboard-user-name { font-weight: 500; }
+        .leaderboard-user-stats { font-size: 0.75rem; color: #666; }
+        .leaderboard-score { font-size: 1.25rem; font-weight: 700; }
+        .leaderboard-score.good { color: #22863a; }
+        .leaderboard-score.medium { color: #dbab09; }
+        .leaderboard-score.bad { color: #cb2431; }
+        .session-info { background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .session-info-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.875rem; }
+        .session-info-label { color: #666; }
+        .session-info-value { font-weight: 500; }
+
         @media (max-width: 480px) {
             .container { padding: 16px 12px; }
             .question-card { padding: 20px 16px; }
@@ -256,6 +300,11 @@
         let syncTimeout = null;
         let timerInterval = null;
         let initialSyncDone = false; // Block outgoing sync until we've loaded from cloud
+
+        // Shared session variables
+        let sharedSession = null;      // Current shared session data
+        let sessionChannel = null;     // Supabase Realtime channel
+        let sessionParticipants = [];  // List of participants
 
         // Auth functions
         async function checkAuthorization(email) {
@@ -742,6 +791,692 @@
             if (modal) modal.classList.remove('visible');
         };
 
+        // ========== SHARED SESSION FUNCTIONS ==========
+
+        function generateSessionCode() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        function showCreateSharedSession() {
+            selectedMaterie = [];
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Crea Sessione Condivisa</h1>
+                    <p class="subtitle">Configura il quiz per il tuo gruppo</p>
+
+                    <div style="max-width:400px;margin:0 auto;">
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:0.875rem;display:block;margin-bottom:8px;">Tipo di quiz</label>
+                            <select id="quiz-type-select" style="width:100%;padding:12px;border:1px solid #e0e0e0;border-radius:6px;font-size:0.9375rem;">
+                                <option value="140">Simulazione SSM (140 domande)</option>
+                                <option value="20">Esercitazione rapida (20 domande)</option>
+                                <option value="custom">Personalizzato</option>
+                            </select>
+                        </div>
+
+                        <div id="custom-options" style="display:none;">
+                            <div style="margin-bottom:20px;">
+                                <label style="font-size:0.875rem;">Numero domande: <strong id="num-display">50</strong></label>
+                                <input type="range" id="num-slider" min="10" max="100" value="50" style="width:100%;margin-top:8px;">
+                            </div>
+                            <div class="materie-filter" style="margin-bottom:20px;">
+                                <h4 style="font-size:0.875rem;margin-bottom:8px;">Filtra per materie (opzionale)</h4>
+                                <div class="filter-actions" style="margin-bottom:8px;">
+                                    <button class="btn btn-secondary btn-small" id="select-all">Tutte</button>
+                                    <button class="btn btn-secondary btn-small" id="select-none">Nessuna</button>
+                                </div>
+                                <div class="materie-grid" id="materie-grid">
+                                    ${materie.map(m => `<span class="materia-chip" data-materia="${encodeURIComponent(m)}">${m}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:20px;">
+                            <label style="font-size:0.875rem;display:block;margin-bottom:8px;">Limite di tempo</label>
+                            <select id="time-limit-select" style="width:100%;padding:12px;border:1px solid #e0e0e0;border-radius:6px;font-size:0.9375rem;">
+                                <option value="0">Nessun limite</option>
+                                <option value="30">30 minuti</option>
+                                <option value="60">1 ora</option>
+                                <option value="90">1 ora e 30 minuti</option>
+                                <option value="120">2 ore</option>
+                                <option value="210" selected>3 ore e 30 minuti (SSM)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="back-btn">Indietro</button>
+                        <button class="btn btn-primary" id="create-session-btn">Crea sessione</button>
+                    </div>
+                </div>
+            `);
+
+            const quizTypeSelect = document.getElementById('quiz-type-select');
+            const customOptions = document.getElementById('custom-options');
+            const timeLimitSelect = document.getElementById('time-limit-select');
+            const slider = document.getElementById('num-slider');
+            const numDisplay = document.getElementById('num-display');
+
+            quizTypeSelect.addEventListener('change', () => {
+                const isCustom = quizTypeSelect.value === 'custom';
+                customOptions.style.display = isCustom ? 'block' : 'none';
+                // Set default time limit based on quiz type
+                if (quizTypeSelect.value === '140') {
+                    timeLimitSelect.value = '210';
+                } else if (quizTypeSelect.value === '20') {
+                    timeLimitSelect.value = '30';
+                } else {
+                    timeLimitSelect.value = '60';
+                }
+            });
+
+            if (slider) {
+                slider.addEventListener('input', () => numDisplay.textContent = slider.value);
+            }
+
+            document.querySelectorAll('.materia-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    const m = decodeURIComponent(this.dataset.materia);
+                    if (this.classList.contains('selected')) {
+                        selectedMaterie.push(m);
+                    } else {
+                        selectedMaterie = selectedMaterie.filter(x => x !== m);
+                    }
+                });
+            });
+
+            document.getElementById('select-all')?.addEventListener('click', () => {
+                selectedMaterie = [...materie];
+                document.querySelectorAll('.materia-chip').forEach(c => c.classList.add('selected'));
+            });
+
+            document.getElementById('select-none')?.addEventListener('click', () => {
+                selectedMaterie = [];
+                document.querySelectorAll('.materia-chip').forEach(c => c.classList.remove('selected'));
+            });
+
+            document.getElementById('back-btn').addEventListener('click', showStart);
+            document.getElementById('create-session-btn').addEventListener('click', async () => {
+                const quizType = quizTypeSelect.value;
+                const timeLimit = parseInt(timeLimitSelect.value) || null;
+                let questionCount = quizType === '140' ? 140 : quizType === '20' ? 20 : parseInt(slider.value);
+                await createSharedSession(quizType, questionCount, timeLimit);
+            });
+        }
+
+        async function createSharedSession(quizType, questionCount, timeLimit) {
+            if (!currentUser) return;
+
+            // Generate unique code
+            let code = generateSessionCode();
+            let attempts = 0;
+
+            // Select questions based on quiz type
+            let questionIds;
+            if (quizType === '140') {
+                questionIds = selectSSMQuestions();
+            } else if (quizType === 'custom' && selectedMaterie.length > 0) {
+                let filtered = questions.map((q, i) => i).filter(i => selectedMaterie.includes(questions[i].materia));
+                questionIds = shuffle(filtered).slice(0, Math.min(questionCount, filtered.length));
+            } else {
+                questionIds = shuffle(questions.map((q, i) => i)).slice(0, questionCount);
+            }
+
+            if (questionIds.length === 0) {
+                alert('Nessuna domanda disponibile per i criteri selezionati');
+                return;
+            }
+
+            try {
+                // Create session
+                const { data: session, error } = await supabase
+                    .from('shared_sessions')
+                    .insert({
+                        code: code,
+                        created_by: currentUser.id,
+                        creator_name: currentUser.email.split('@')[0],
+                        question_ids: questionIds,
+                        quiz_type: quizType,
+                        question_count: questionIds.length,
+                        time_limit: timeLimit,
+                        status: 'waiting'
+                    })
+                    .select()
+                    .single();
+
+                if (error) throw error;
+
+                // Add creator as participant
+                const { error: participantError } = await supabase
+                    .from('session_participants')
+                    .insert({
+                        session_id: session.id,
+                        user_id: currentUser.id,
+                        user_name: currentUser.email.split('@')[0],
+                        user_email: currentUser.email
+                    });
+
+                if (participantError) throw participantError;
+
+                sharedSession = session;
+                showLobby(true); // true = is host
+
+            } catch (err) {
+                console.error('Error creating session:', err);
+                alert('Errore nella creazione della sessione: ' + err.message);
+            }
+        }
+
+        function showJoinSession() {
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Unisciti a una Sessione</h1>
+                    <p class="subtitle">Inserisci il codice della sessione condiviso dall'host</p>
+
+                    <div style="margin:32px 0;">
+                        <input type="text" id="session-code-input" class="join-input" maxlength="6" placeholder="CODICE" autocomplete="off">
+                    </div>
+
+                    <div class="actions" style="justify-content:center;">
+                        <button class="btn btn-secondary" id="back-btn">Indietro</button>
+                        <button class="btn btn-primary" id="join-btn">Unisciti</button>
+                    </div>
+
+                    <p id="join-error" style="color:#cb2431;margin-top:16px;display:none;"></p>
+                </div>
+            `);
+
+            const input = document.getElementById('session-code-input');
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            });
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') document.getElementById('join-btn').click();
+            });
+
+            document.getElementById('back-btn').addEventListener('click', showStart);
+            document.getElementById('join-btn').addEventListener('click', async () => {
+                const code = input.value.trim();
+                if (code.length !== 6) {
+                    document.getElementById('join-error').textContent = 'Il codice deve essere di 6 caratteri';
+                    document.getElementById('join-error').style.display = 'block';
+                    return;
+                }
+                await joinSharedSession(code);
+            });
+
+            input.focus();
+        }
+
+        async function joinSharedSession(code) {
+            if (!currentUser) return;
+
+            const errorEl = document.getElementById('join-error');
+
+            try {
+                // Find session by code
+                const { data: session, error } = await supabase
+                    .from('shared_sessions')
+                    .select('*')
+                    .eq('code', code.toUpperCase())
+                    .single();
+
+                if (error || !session) {
+                    errorEl.textContent = 'Sessione non trovata. Verifica il codice.';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                if (session.status !== 'waiting') {
+                    errorEl.textContent = 'Questa sessione è già iniziata o terminata.';
+                    errorEl.style.display = 'block';
+                    return;
+                }
+
+                // Check if already joined
+                const { data: existingParticipant } = await supabase
+                    .from('session_participants')
+                    .select('*')
+                    .eq('session_id', session.id)
+                    .eq('user_id', currentUser.id)
+                    .single();
+
+                if (!existingParticipant) {
+                    // Add user as participant
+                    const { error: participantError } = await supabase
+                        .from('session_participants')
+                        .insert({
+                            session_id: session.id,
+                            user_id: currentUser.id,
+                            user_name: currentUser.email.split('@')[0],
+                            user_email: currentUser.email
+                        });
+
+                    if (participantError) throw participantError;
+                }
+
+                sharedSession = session;
+                showLobby(session.created_by === currentUser.id);
+
+            } catch (err) {
+                console.error('Error joining session:', err);
+                errorEl.textContent = 'Errore: ' + err.message;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        async function showLobby(isHost) {
+            if (!sharedSession) {
+                showStart();
+                return;
+            }
+
+            // Subscribe to realtime updates
+            subscribeToSession(sharedSession.id);
+
+            // Fetch current participants
+            await refreshParticipants();
+
+            renderLobby(isHost);
+        }
+
+        async function refreshParticipants() {
+            const { data, error } = await supabase
+                .from('session_participants')
+                .select('*')
+                .eq('session_id', sharedSession.id)
+                .order('joined_at', { ascending: true });
+
+            if (!error && data) {
+                sessionParticipants = data;
+            }
+        }
+
+        function renderLobby(isHost) {
+            const quizTypeLabels = {
+                '140': 'Simulazione SSM',
+                '20': 'Esercitazione rapida',
+                'custom': 'Quiz personalizzato'
+            };
+
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="lobby-screen">
+                    <h1>Sessione Condivisa</h1>
+                    <p class="subtitle">${isHost ? 'Condividi il codice con i partecipanti' : 'In attesa che l\'host avvii la sessione'}</p>
+
+                    <div class="session-code-label">Codice sessione</div>
+                    <div class="session-code">${sharedSession.code}</div>
+
+                    <div class="session-info">
+                        <div class="session-info-row">
+                            <span class="session-info-label">Tipo quiz</span>
+                            <span class="session-info-value">${quizTypeLabels[sharedSession.quiz_type] || sharedSession.quiz_type}</span>
+                        </div>
+                        <div class="session-info-row">
+                            <span class="session-info-label">Domande</span>
+                            <span class="session-info-value">${sharedSession.question_count}</span>
+                        </div>
+                        <div class="session-info-row">
+                            <span class="session-info-label">Tempo</span>
+                            <span class="session-info-value">${sharedSession.time_limit ? sharedSession.time_limit + ' minuti' : 'Illimitato'}</span>
+                        </div>
+                    </div>
+
+                    <div class="participant-list">
+                        <h3>Partecipanti (${sessionParticipants.length})</h3>
+                        ${sessionParticipants.map(p => `
+                            <div class="participant-item">
+                                <div class="participant-avatar">${(p.user_name || p.user_email || '?')[0].toUpperCase()}</div>
+                                <div class="participant-name">${p.user_name || p.user_email}</div>
+                                ${p.user_id === sharedSession.created_by ? '<span class="participant-host">Host</span>' : ''}
+                                <span class="participant-status">Pronto</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${!isHost ? `
+                        <div class="waiting-animation">
+                            <div class="waiting-dot"></div>
+                            <div class="waiting-dot"></div>
+                            <div class="waiting-dot"></div>
+                        </div>
+                        <p style="color:#666;font-size:0.875rem;">In attesa dell'host...</p>
+                    ` : ''}
+
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="leave-btn">Abbandona</button>
+                        ${isHost ? '<button class="btn btn-primary" id="start-session-btn">Avvia sessione</button>' : ''}
+                    </div>
+                </div>
+            `);
+
+            document.getElementById('leave-btn').addEventListener('click', async () => {
+                if (confirm('Sei sicuro di voler abbandonare la sessione?')) {
+                    await leaveSession();
+                }
+            });
+
+            if (isHost) {
+                document.getElementById('start-session-btn').addEventListener('click', async () => {
+                    if (sessionParticipants.length < 1) {
+                        alert('Attendi almeno un partecipante');
+                        return;
+                    }
+                    await startSharedSession();
+                });
+            }
+        }
+
+        function subscribeToSession(sessionId) {
+            // Clean up existing subscription
+            if (sessionChannel) {
+                supabase.removeChannel(sessionChannel);
+            }
+
+            sessionChannel = supabase.channel(`session-${sessionId}`)
+                .on('postgres_changes',
+                    { event: '*', schema: 'public', table: 'session_participants', filter: `session_id=eq.${sessionId}` },
+                    async (payload) => {
+                        await refreshParticipants();
+                        // Re-render lobby if still in lobby
+                        if (sharedSession && sharedSession.status === 'waiting') {
+                            renderLobby(sharedSession.created_by === currentUser.id);
+                        } else if (sharedSession && sharedSession.status === 'active') {
+                            // Update leaderboard if in results
+                            const resultsEl = document.querySelector('.leaderboard');
+                            if (resultsEl) {
+                                updateSharedLeaderboard();
+                            }
+                        }
+                    })
+                .on('postgres_changes',
+                    { event: 'UPDATE', schema: 'public', table: 'shared_sessions', filter: `id=eq.${sessionId}` },
+                    (payload) => {
+                        const newStatus = payload.new.status;
+                        if (newStatus === 'active' && sharedSession.status === 'waiting') {
+                            sharedSession = payload.new;
+                            startSharedQuiz();
+                        } else if (newStatus === 'completed') {
+                            sharedSession = payload.new;
+                        } else {
+                            sharedSession = payload.new;
+                        }
+                    })
+                .subscribe();
+        }
+
+        async function leaveSession() {
+            if (sharedSession && currentUser) {
+                await supabase
+                    .from('session_participants')
+                    .delete()
+                    .eq('session_id', sharedSession.id)
+                    .eq('user_id', currentUser.id);
+            }
+
+            if (sessionChannel) {
+                supabase.removeChannel(sessionChannel);
+                sessionChannel = null;
+            }
+
+            sharedSession = null;
+            sessionParticipants = [];
+            showStart();
+        }
+
+        async function startSharedSession() {
+            if (!sharedSession || sharedSession.created_by !== currentUser.id) return;
+
+            try {
+                const { error } = await supabase
+                    .from('shared_sessions')
+                    .update({
+                        status: 'active',
+                        started_at: new Date().toISOString()
+                    })
+                    .eq('id', sharedSession.id);
+
+                if (error) throw error;
+
+                // The realtime subscription will trigger startSharedQuiz for everyone
+            } catch (err) {
+                console.error('Error starting session:', err);
+                alert('Errore nell\'avvio della sessione: ' + err.message);
+            }
+        }
+
+        function startSharedQuiz() {
+            if (!sharedSession) return;
+
+            // Clear any running timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            const pool = sharedSession.question_ids;
+            const startTime = new Date(sharedSession.started_at).getTime();
+            const endTime = sharedSession.time_limit
+                ? startTime + (sharedSession.time_limit * 60 * 1000)
+                : null;
+
+            quiz = {
+                pool,
+                current: 0,
+                correct: 0,
+                wrong: 0,
+                skipped: 0,
+                mistakes: [],
+                mode: 'shared',
+                startTime,
+                endTime,
+                answers: {},
+                questionOptions: {},
+                isShared: true
+            };
+
+            showQuestion();
+        }
+
+        async function finishSharedQuiz() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+
+            if (!sharedSession || !quiz) return;
+
+            // Calculate subject breakdown
+            const subjectBreakdown = {};
+
+            // Calculate results
+            quiz.pool.forEach((qIdx) => {
+                const q = questions[qIdx];
+                const answer = quiz.answers[qIdx];
+
+                if (!subjectBreakdown[q.materia]) {
+                    subjectBreakdown[q.materia] = { correct: 0, wrong: 0, skipped: 0 };
+                }
+
+                if (answer === undefined) {
+                    quiz.skipped++;
+                    subjectBreakdown[q.materia].skipped++;
+                } else {
+                    const selectedOption = q.risposte.find(r => r.id === answer);
+                    if (selectedOption && selectedOption.isCorrect) {
+                        quiz.correct++;
+                        subjectBreakdown[q.materia].correct++;
+                    } else {
+                        quiz.wrong++;
+                        subjectBreakdown[q.materia].wrong++;
+                        quiz.mistakes.push({
+                            domanda: q.domanda,
+                            materia: q.materia,
+                            argomento: q.argomenti,
+                            tua: selectedOption ? selectedOption.text : 'N/A',
+                            corretta: q.risposta_corretta_text,
+                            commento: q.commento,
+                            has_image: q.has_image,
+                            image_src: q.image_src
+                        });
+                        if (!wrongIds.includes(qIdx)) { wrongIds.push(qIdx); saveWrong(); }
+                    }
+
+                    const isCorrect = selectedOption && selectedOption.isCorrect;
+                    recordAnswer(q.materia, q.argomenti, isCorrect);
+                }
+            });
+
+            const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
+
+            // Save results to session_participants
+            try {
+                await supabase
+                    .from('session_participants')
+                    .update({
+                        answers: quiz.answers,
+                        score: ssmScore,
+                        correct: quiz.correct,
+                        wrong: quiz.wrong,
+                        skipped: quiz.skipped,
+                        completed_at: new Date().toISOString()
+                    })
+                    .eq('session_id', sharedSession.id)
+                    .eq('user_id', currentUser.id);
+            } catch (err) {
+                console.error('Error saving results:', err);
+            }
+
+            recordProjectedScore();
+            showSharedResults();
+        }
+
+        async function showSharedResults() {
+            await refreshParticipants();
+
+            const total = quiz.pool.length;
+            const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
+            const maxScore = total;
+
+            // Sort participants by score (completed first, then by score)
+            const sortedParticipants = [...sessionParticipants].sort((a, b) => {
+                if (a.completed_at && !b.completed_at) return -1;
+                if (!a.completed_at && b.completed_at) return 1;
+                return (b.score || 0) - (a.score || 0);
+            });
+
+            const completedCount = sessionParticipants.filter(p => p.completed_at).length;
+
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="results">
+                    <h2>Risultati Sessione Condivisa</h2>
+                    <div class="score">${ssmScore.toFixed(2)}</div>
+                    <div class="score-label">Il tuo punteggio su ${maxScore}</div>
+
+                    <div class="results-breakdown">
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#22863a;">+${quiz.correct}</div><div class="breakdown-label">Corrette (+1)</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#cb2431;">${quiz.wrong > 0 ? '-' + (quiz.wrong * 0.25).toFixed(2) : '0'}</div><div class="breakdown-label">Errate (-0.25)</div></div>
+                        <div class="breakdown-item"><div class="breakdown-value" style="color:#888;">${quiz.skipped}</div><div class="breakdown-label">Omesse (0)</div></div>
+                    </div>
+
+                    <div class="leaderboard" id="leaderboard">
+                        <h3>Classifica (${completedCount}/${sessionParticipants.length} completati)</h3>
+                        ${sortedParticipants.map((p, idx) => {
+                            const scoreClass = p.score >= 100 ? 'good' : p.score >= 70 ? 'medium' : 'bad';
+                            const isMe = p.user_id === currentUser.id;
+                            return `
+                                <div class="leaderboard-item" ${isMe ? 'style="border:2px solid #0969da;"' : ''}>
+                                    <div class="leaderboard-rank">${p.completed_at ? idx + 1 : '-'}</div>
+                                    <div class="leaderboard-user">
+                                        <div class="leaderboard-user-name">${p.user_name || p.user_email}${isMe ? ' (tu)' : ''}</div>
+                                        <div class="leaderboard-user-stats">
+                                            ${p.completed_at
+                                                ? `✓${p.correct} ✗${p.wrong} ○${p.skipped}`
+                                                : '<span style="color:#dbab09;">In corso...</span>'}
+                                        </div>
+                                    </div>
+                                    <div class="leaderboard-score ${p.completed_at ? scoreClass : ''}">${p.completed_at ? p.score.toFixed(2) : '...'}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="actions" style="justify-content:center;">
+                        <button class="btn btn-primary" id="home-btn">Torna al menu</button>
+                    </div>
+
+                    ${quiz.mistakes.length > 0 ? `
+                        <div class="review-section">
+                            <h3>Da ripassare (${quiz.mistakes.length})</h3>
+                            ${quiz.mistakes.map(m => `
+                                <div class="review-item">
+                                    <div class="review-materia">${m.materia} → ${m.argomento}</div>
+                                    <div class="review-question">${m.domanda}</div>
+                                    ${m.has_image && m.image_src ? `<div class="review-image"><img src="${m.image_src}" alt="Immagine"></div>` : ''}
+                                    <div class="review-your">Hai risposto: ${m.tua}</div>
+                                    <div class="review-correct">Corretta: ${m.corretta}</div>
+                                    ${m.commento ? `<div class="review-commento">${m.commento}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `);
+
+            document.getElementById('home-btn').addEventListener('click', async () => {
+                if (sessionChannel) {
+                    supabase.removeChannel(sessionChannel);
+                    sessionChannel = null;
+                }
+                sharedSession = null;
+                sessionParticipants = [];
+                showStart();
+            });
+        }
+
+        async function updateSharedLeaderboard() {
+            const leaderboardEl = document.getElementById('leaderboard');
+            if (!leaderboardEl) return;
+
+            await refreshParticipants();
+
+            const sortedParticipants = [...sessionParticipants].sort((a, b) => {
+                if (a.completed_at && !b.completed_at) return -1;
+                if (!a.completed_at && b.completed_at) return 1;
+                return (b.score || 0) - (a.score || 0);
+            });
+
+            const completedCount = sessionParticipants.filter(p => p.completed_at).length;
+
+            leaderboardEl.innerHTML = `
+                <h3>Classifica (${completedCount}/${sessionParticipants.length} completati)</h3>
+                ${sortedParticipants.map((p, idx) => {
+                    const scoreClass = p.score >= 100 ? 'good' : p.score >= 70 ? 'medium' : 'bad';
+                    const isMe = p.user_id === currentUser.id;
+                    return `
+                        <div class="leaderboard-item" ${isMe ? 'style="border:2px solid #0969da;"' : ''}>
+                            <div class="leaderboard-rank">${p.completed_at ? idx + 1 : '-'}</div>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-user-name">${p.user_name || p.user_email}${isMe ? ' (tu)' : ''}</div>
+                                <div class="leaderboard-user-stats">
+                                    ${p.completed_at
+                                        ? `✓${p.correct} ✗${p.wrong} ○${p.skipped}`
+                                        : '<span style="color:#dbab09;">In corso...</span>'}
+                                </div>
+                            </div>
+                            <div class="leaderboard-score ${p.completed_at ? scoreClass : ''}">${p.completed_at ? p.score.toFixed(2) : '...'}</div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        // ========== END SHARED SESSION FUNCTIONS ==========
+
         function showStart() {
             // Check authorization
             if (!currentUser) {
@@ -794,6 +1529,14 @@
                             <span>${weakAreas.length} aree sotto il 60%</span>
                         </div>
                         ` : ''}
+                        <div class="mode-option shared-session-card" data-mode="shared-create">
+                            <strong style="color:#0969da;">Crea sessione condivisa</strong>
+                            <span>Invita altri a fare lo stesso test</span>
+                        </div>
+                        <div class="mode-option" data-mode="shared-join" style="border-color:#0969da;">
+                            <strong style="color:#0969da;">Unisciti a sessione</strong>
+                            <span>Inserisci il codice di invito</span>
+                        </div>
                     </div>
                     <button class="btn btn-primary" id="start-btn">Inizia</button>
                     ${hasStats ? `<button class="btn btn-secondary" id="stats-btn" style="margin-left:12px;">Statistiche</button>` : ''}
@@ -816,6 +1559,10 @@
                     showCustomSetup();
                 } else if (selectedMode === 'weak') {
                     startWeakAreasQuiz();
+                } else if (selectedMode === 'shared-create') {
+                    showCreateSharedSession();
+                } else if (selectedMode === 'shared-join') {
+                    showJoinSession();
                 } else {
                     startQuiz(selectedMode);
                 }
@@ -1368,7 +2115,11 @@
             if (remaining <= 0) {
                 clearInterval(timerInterval);
                 alert('Tempo scaduto! Il quiz verrà terminato.');
-                finishSSMQuiz();
+                if (quiz.mode === 'shared') {
+                    finishSharedQuiz();
+                } else {
+                    finishSSMQuiz();
+                }
             }
         }
 
@@ -1377,7 +2128,7 @@
             const q = questions[idx];
             const total = quiz.pool.length;
             const progress = ((quiz.current + 1) / total * 100).toFixed(0);
-            const isSSM = quiz.mode === '140';
+            const isSSM = quiz.mode === '140' || quiz.mode === 'shared';
 
             // For SSM, use stored order or create new shuffled order
             if (!quiz.questionOptions) quiz.questionOptions = {};
@@ -1392,8 +2143,8 @@
             // Count answered questions for SSM
             const answeredCount = quiz.answers ? Object.keys(quiz.answers).length : 0;
 
-            // Start timer for SSM
-            if (isSSM && !timerInterval) {
+            // Start timer for SSM (only if there's a time limit)
+            if (isSSM && quiz.endTime && !timerInterval) {
                 timerInterval = setInterval(updateTimer, 1000);
             }
 
@@ -1404,8 +2155,8 @@
             render(`
                 <header>
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <h1>Simulatore SSM <span class="materia-tag">${q.materia}</span></h1>
-                        ${isSSM ? `<div id="timer" class="timer">${formatTime(quiz.endTime - Date.now())}</div>` : ''}
+                        <h1>${quiz.mode === 'shared' ? 'Sessione Condivisa' : 'Simulatore SSM'} <span class="materia-tag">${q.materia}</span></h1>
+                        ${isSSM && quiz.endTime ? `<div id="timer" class="timer">${formatTime(quiz.endTime - Date.now())}</div>` : ''}
                     </div>
                     <div class="stats">${statsHtml}</div>
                     <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
@@ -1467,19 +2218,24 @@
                 });
                 document.getElementById('submit-btn')?.addEventListener('click', () => {
                     const unanswered = total - Object.keys(quiz.answers || {}).length;
+                    const finishFn = quiz.mode === 'shared' ? finishSharedQuiz : finishSSMQuiz;
                     if (unanswered > 0) {
                         if (confirm(`Hai ${unanswered} domande senza risposta. Vuoi terminare comunque?`)) {
-                            finishSSMQuiz();
+                            finishFn();
                         }
                     } else {
-                        finishSSMQuiz();
+                        finishFn();
                     }
                 });
-                document.getElementById('quit-btn')?.addEventListener('click', () => {
+                document.getElementById('quit-btn')?.addEventListener('click', async () => {
                     if (confirm('Sei sicuro di voler abbandonare? I tuoi progressi andranno persi.')) {
                         clearInterval(timerInterval);
                         timerInterval = null;
-                        showStart();
+                        if (quiz.mode === 'shared' && sharedSession) {
+                            await leaveSession();
+                        } else {
+                            showStart();
+                        }
                     }
                 });
                 document.querySelectorAll('.question-nav-btn').forEach(btn => {
