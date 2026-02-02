@@ -1269,11 +1269,23 @@
             }
 
             if (sharedSession && currentUser) {
-                await supabase
-                    .from('session_participants')
-                    .delete()
-                    .eq('session_id', sharedSession.id)
-                    .eq('user_id', currentUser.id);
+                const isHost = sharedSession.created_by === currentUser.id;
+                const sessionId = sharedSession.id;
+
+                if (isHost) {
+                    // Host leaving: delete the entire session (CASCADE deletes participants)
+                    await supabase
+                        .from('shared_sessions')
+                        .delete()
+                        .eq('id', sessionId);
+                } else {
+                    // Participant leaving: just remove themselves
+                    await supabase
+                        .from('session_participants')
+                        .delete()
+                        .eq('session_id', sessionId)
+                        .eq('user_id', currentUser.id);
+                }
             }
 
             if (sessionChannel) {

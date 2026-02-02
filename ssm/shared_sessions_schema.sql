@@ -49,6 +49,10 @@ CREATE POLICY "Users can create sessions" ON shared_sessions
 CREATE POLICY "Creators can update their sessions" ON shared_sessions
   FOR UPDATE USING (auth.uid() = created_by);
 
+-- I creatori possono eliminare le proprie sessioni
+CREATE POLICY "Creators can delete their sessions" ON shared_sessions
+  FOR DELETE USING (auth.uid() = created_by);
+
 -- Policy per session_participants
 -- Tutti gli utenti autenticati possono vedere i partecipanti
 CREATE POLICY "Users can view participants" ON session_participants
@@ -87,3 +91,41 @@ END $$;
 CREATE INDEX idx_shared_sessions_code ON shared_sessions(code);
 CREATE INDEX idx_shared_sessions_status ON shared_sessions(status);
 CREATE INDEX idx_session_participants_session ON session_participants(session_id);
+
+-- Trigger: elimina sessioni senza partecipanti
+CREATE OR REPLACE FUNCTION cleanup_empty_sessions()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Dopo che un partecipante esce, controlla se la sessione è vuota
+    DELETE FROM shared_sessions
+    WHERE id = OLD.session_id
+    AND NOT EXISTS (
+        SELECT 1 FROM session_participants
+        WHERE session_id = OLD.session_id
+    );
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER trigger_cleanup_empty_sessions
+    AFTER DELETE ON session_participants
+    FOR EACH ROW
+    EXECUTE FUNCTION cleanup_empty_sessions();
+
+-- Funzione per pulizia sessioni vecchie (> 24 ore)
+-- Eseguire periodicamente con pg_cron o manualmente
+CREATE OR REPLACE FUNCTION cleanup_old_sessions()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM shared_sessions
+    WHERE created_at < NOW() - INTERVAL '24 hours';
+
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Per eseguire la pulizia manualmente:
+-- SELECT cleanup_old_sessions();
