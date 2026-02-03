@@ -1060,7 +1060,7 @@
                     .select('*')
                     .eq('session_id', session.id)
                     .eq('user_id', currentUser.id)
-                    .single();
+                    .maybeSingle();
 
                 if (!existingParticipant) {
                     // Add user as participant
