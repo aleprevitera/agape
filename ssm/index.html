@@ -1140,14 +1140,28 @@
         }
 
         async function refreshParticipants() {
-            const { data, error } = await supabase
-                .from('session_participants')
-                .select('*')
-                .eq('session_id', sharedSession.id)
-                .order('joined_at', { ascending: true });
+            if (!sharedSession || !sharedSession.id) {
+                console.warn('refreshParticipants: sharedSession not available');
+                return;
+            }
 
-            if (!error && data) {
-                sessionParticipants = data;
+            try {
+                const { data, error } = await supabase
+                    .from('session_participants')
+                    .select('*')
+                    .eq('session_id', sharedSession.id)
+                    .order('joined_at', { ascending: true });
+
+                if (error) {
+                    console.error('Error fetching participants:', error);
+                    return;
+                }
+
+                if (data) {
+                    sessionParticipants = data;
+                }
+            } catch (err) {
+                console.error('refreshParticipants error:', err);
             }
         }
 
@@ -1378,10 +1392,22 @@
             clearInterval(timerInterval);
             timerInterval = null;
 
-            if (!sharedSession || !quiz) return;
+            // Validate state - throw error instead of silent return
+            if (!quiz) {
+                throw new Error('Quiz non inizializzato');
+            }
+            if (!sharedSession) {
+                console.warn('sharedSession is null, showing results anyway');
+            }
 
             // Calculate subject breakdown
             const subjectBreakdown = {};
+
+            // Reset counters to avoid double counting if called twice
+            quiz.correct = 0;
+            quiz.wrong = 0;
+            quiz.skipped = 0;
+            quiz.mistakes = [];
 
             // Calculate results
             quiz.pool.forEach((qIdx) => {
@@ -1423,22 +1449,29 @@
 
             const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
 
-            // Save results to session_participants
-            try {
-                await supabase
-                    .from('session_participants')
-                    .update({
-                        answers: quiz.answers,
-                        score: ssmScore,
-                        correct: quiz.correct,
-                        wrong: quiz.wrong,
-                        skipped: quiz.skipped,
-                        completed_at: new Date().toISOString()
-                    })
-                    .eq('session_id', sharedSession.id)
-                    .eq('user_id', currentUser.id);
-            } catch (err) {
-                console.error('Error saving results:', err);
+            // Save results to session_participants (if session exists)
+            if (sharedSession && currentUser) {
+                try {
+                    const { error } = await supabase
+                        .from('session_participants')
+                        .update({
+                            answers: quiz.answers,
+                            score: ssmScore,
+                            correct: quiz.correct,
+                            wrong: quiz.wrong,
+                            skipped: quiz.skipped,
+                            completed_at: new Date().toISOString()
+                        })
+                        .eq('session_id', sharedSession.id)
+                        .eq('user_id', currentUser.id);
+
+                    if (error) {
+                        console.error('Supabase update error:', error);
+                    }
+                } catch (err) {
+                    console.error('Error saving results:', err);
+                    // Continue anyway - show results with local data
+                }
             }
 
             recordProjectedScore();
@@ -1446,17 +1479,25 @@
         }
 
         async function showSharedResults() {
-            await refreshParticipants();
+            // Try to refresh participants, but don't block on failure
+            try {
+                await refreshParticipants();
+            } catch (err) {
+                console.error('Error refreshing participants:', err);
+                // Continue with existing sessionParticipants data
+            }
 
             const total = quiz.pool.length;
             const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
             const maxScore = total;
 
-            // Sort participants by score (completed first, then by score)
             // Helper to check if participant data is fully synced
             const isParticipantComplete = (p) => p.completed_at && p.score != null;
 
-            const sortedParticipants = [...sessionParticipants].sort((a, b) => {
+            // Use sessionParticipants if available, otherwise empty array
+            const participants = sessionParticipants || [];
+
+            const sortedParticipants = [...participants].sort((a, b) => {
                 const aComplete = isParticipantComplete(a);
                 const bComplete = isParticipantComplete(b);
                 if (aComplete && !bComplete) return -1;
@@ -1464,7 +1505,7 @@
                 return (b.score ?? 0) - (a.score ?? 0);
             });
 
-            const completedCount = sessionParticipants.filter(isParticipantComplete).length;
+            const completedCount = participants.filter(isParticipantComplete).length;
 
             render(`
                 ${getAuthHeaderHtml()}
@@ -1480,16 +1521,16 @@
                     </div>
 
                     <div class="leaderboard" id="leaderboard">
-                        <h3>Classifica (${completedCount}/${sessionParticipants.length} completati)</h3>
+                        <h3>Classifica (${completedCount}/${participants.length} completati)</h3>
                         ${sortedParticipants.map((p, idx) => {
                             const pComplete = isParticipantComplete(p);
                             const scoreClass = pComplete ? (p.score >= 100 ? 'good' : p.score >= 70 ? 'medium' : 'bad') : '';
-                            const isMe = p.user_id === currentUser.id;
+                            const isMe = currentUser && p.user_id === currentUser.id;
                             return `
                                 <div class="leaderboard-item" ${isMe ? 'style="border:2px solid #0969da;"' : ''}>
                                     <div class="leaderboard-rank">${pComplete ? idx + 1 : '-'}</div>
                                     <div class="leaderboard-user">
-                                        <div class="leaderboard-user-name">${p.user_name || p.user_email}${isMe ? ' (tu)' : ''}</div>
+                                        <div class="leaderboard-user-name">${p.user_name || p.user_email || 'Anonimo'}${isMe ? ' (tu)' : ''}</div>
                                         <div class="leaderboard-user-stats">
                                             ${pComplete
                                                 ? `✓${p.correct ?? 0} ✗${p.wrong ?? 0} ○${p.skipped ?? 0}`
@@ -1539,12 +1580,18 @@
             const leaderboardEl = document.getElementById('leaderboard');
             if (!leaderboardEl) return;
 
-            await refreshParticipants();
+            try {
+                await refreshParticipants();
+            } catch (err) {
+                console.error('Error refreshing participants in leaderboard:', err);
+            }
 
             // Helper to check if participant data is fully synced
             const isParticipantComplete = (p) => p.completed_at && p.score != null;
 
-            const sortedParticipants = [...sessionParticipants].sort((a, b) => {
+            const participants = sessionParticipants || [];
+
+            const sortedParticipants = [...participants].sort((a, b) => {
                 const aComplete = isParticipantComplete(a);
                 const bComplete = isParticipantComplete(b);
                 if (aComplete && !bComplete) return -1;
@@ -1552,19 +1599,19 @@
                 return (b.score ?? 0) - (a.score ?? 0);
             });
 
-            const completedCount = sessionParticipants.filter(isParticipantComplete).length;
+            const completedCount = participants.filter(isParticipantComplete).length;
 
             leaderboardEl.innerHTML = `
-                <h3>Classifica (${completedCount}/${sessionParticipants.length} completati)</h3>
+                <h3>Classifica (${completedCount}/${participants.length} completati)</h3>
                 ${sortedParticipants.map((p, idx) => {
                     const pComplete = isParticipantComplete(p);
                     const scoreClass = pComplete ? (p.score >= 100 ? 'good' : p.score >= 70 ? 'medium' : 'bad') : '';
-                    const isMe = p.user_id === currentUser.id;
+                    const isMe = currentUser && p.user_id === currentUser.id;
                     return `
                         <div class="leaderboard-item" ${isMe ? 'style="border:2px solid #0969da;"' : ''}>
                             <div class="leaderboard-rank">${pComplete ? idx + 1 : '-'}</div>
                             <div class="leaderboard-user">
-                                <div class="leaderboard-user-name">${p.user_name || p.user_email}${isMe ? ' (tu)' : ''}</div>
+                                <div class="leaderboard-user-name">${p.user_name || p.user_email || 'Anonimo'}${isMe ? ' (tu)' : ''}</div>
                                 <div class="leaderboard-user-stats">
                                     ${pComplete
                                         ? `✓${p.correct ?? 0} ✗${p.wrong ?? 0} ○${p.skipped ?? 0}`
@@ -2374,15 +2421,36 @@
                     if (quiz.current < total - 1) { quiz.current++; showQuestion(); }
                     else { document.getElementById('submit-btn').click(); }
                 });
-                document.getElementById('submit-btn')?.addEventListener('click', () => {
+                document.getElementById('submit-btn')?.addEventListener('click', async () => {
                     const unanswered = total - Object.keys(quiz.answers || {}).length;
-                    const finishFn = quiz.mode === 'shared' ? finishSharedQuiz : finishSSMQuiz;
+                    const isSharedMode = quiz.mode === 'shared';
+
                     if (unanswered > 0) {
-                        if (confirm(`Hai ${unanswered} domande senza risposta. Vuoi terminare comunque?`)) {
-                            finishFn();
+                        if (!confirm(`Hai ${unanswered} domande senza risposta. Vuoi terminare comunque?`)) {
+                            return;
                         }
-                    } else {
-                        finishFn();
+                    }
+
+                    // Disable button and show loading state
+                    const submitBtn = document.getElementById('submit-btn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Salvataggio...';
+                    }
+
+                    try {
+                        if (isSharedMode) {
+                            await finishSharedQuiz();
+                        } else {
+                            finishSSMQuiz();
+                        }
+                    } catch (err) {
+                        console.error('Error finishing quiz:', err);
+                        alert('Errore durante il salvataggio. Riprova.');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Termina esame';
+                        }
                     }
                 });
                 document.getElementById('quit-btn')?.addEventListener('click', async () => {
