@@ -1254,31 +1254,46 @@
                 .on('postgres_changes',
                     { event: '*', schema: 'public', table: 'session_participants', filter: `session_id=eq.${sessionId}` },
                     async (payload) => {
-                        console.log('Participant change received:', payload);
-                        await refreshParticipants();
-                        // Re-render lobby if still in lobby
-                        if (sharedSession && sharedSession.status === 'waiting') {
-                            renderLobby(sharedSession.created_by === currentUser.id);
-                        } else if (sharedSession && sharedSession.status === 'active') {
-                            // Update leaderboard if in results
-                            const resultsEl = document.querySelector('.leaderboard');
-                            if (resultsEl) {
-                                updateSharedLeaderboard();
+                        try {
+                            console.log('Participant change received:', payload);
+                            await refreshParticipants();
+                            console.log('Participants refreshed, count:', sessionParticipants?.length);
+
+                            // Re-render lobby if still in lobby
+                            if (sharedSession && sharedSession.status === 'waiting') {
+                                const isHost = currentUser && sharedSession.created_by === currentUser.id;
+                                console.log('Re-rendering lobby, isHost:', isHost);
+                                renderLobby(isHost);
+                            } else if (sharedSession && sharedSession.status === 'active') {
+                                // Update leaderboard if in results
+                                const resultsEl = document.querySelector('.leaderboard');
+                                if (resultsEl) {
+                                    console.log('Updating leaderboard');
+                                    updateSharedLeaderboard();
+                                }
                             }
+                        } catch (err) {
+                            console.error('Error in participant change handler:', err);
                         }
                     })
                 .on('postgres_changes',
                     { event: 'UPDATE', schema: 'public', table: 'shared_sessions', filter: `id=eq.${sessionId}` },
                     (payload) => {
-                        console.log('Session change received:', payload);
-                        const newStatus = payload.new.status;
-                        if (newStatus === 'active' && sharedSession.status === 'waiting') {
-                            sharedSession = payload.new;
-                            startSharedQuiz();
-                        } else if (newStatus === 'completed') {
-                            sharedSession = payload.new;
-                        } else {
-                            sharedSession = payload.new;
+                        try {
+                            console.log('Session change received:', payload);
+                            const newStatus = payload.new.status;
+                            const oldStatus = sharedSession?.status;
+                            console.log('Session status change:', oldStatus, '->', newStatus);
+
+                            if (newStatus === 'active' && oldStatus === 'waiting') {
+                                sharedSession = payload.new;
+                                startSharedQuiz();
+                            } else {
+                                // Just update session data, don't trigger anything
+                                sharedSession = { ...sharedSession, ...payload.new };
+                            }
+                        } catch (err) {
+                            console.error('Error in session change handler:', err);
                         }
                     })
                 .subscribe((status, err) => {
@@ -1389,16 +1404,20 @@
         }
 
         async function finishSharedQuiz() {
+            console.log('[finishSharedQuiz] START');
             clearInterval(timerInterval);
             timerInterval = null;
 
             // Validate state - throw error instead of silent return
             if (!quiz) {
+                console.error('[finishSharedQuiz] Quiz non inizializzato');
                 throw new Error('Quiz non inizializzato');
             }
             if (!sharedSession) {
-                console.warn('sharedSession is null, showing results anyway');
+                console.warn('[finishSharedQuiz] sharedSession is null, showing results anyway');
             }
+
+            console.log('[finishSharedQuiz] Starting calculations...');
 
             // Calculate subject breakdown
             const subjectBreakdown = {};
@@ -1448,11 +1467,14 @@
             });
 
             const ssmScore = quiz.correct * 1 + quiz.wrong * (-0.25);
+            console.log('[finishSharedQuiz] Score calculated:', { ssmScore, correct: quiz.correct, wrong: quiz.wrong, skipped: quiz.skipped });
 
             // Save results to session_participants (if session exists)
             if (sharedSession && currentUser) {
+                console.log('[finishSharedQuiz] Saving to Supabase...');
                 try {
-                    const { error } = await supabase
+                    // Wrap update with 10 second timeout to avoid indefinite blocking
+                    const updatePromise = supabase
                         .from('session_participants')
                         .update({
                             answers: quiz.answers,
@@ -1465,25 +1487,47 @@
                         .eq('session_id', sharedSession.id)
                         .eq('user_id', currentUser.id);
 
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Supabase update timeout (10s)')), 10000)
+                    );
+
+                    const { error } = await Promise.race([updatePromise, timeoutPromise]);
+
                     if (error) {
-                        console.error('Supabase update error:', error);
+                        console.error('[finishSharedQuiz] Supabase update error:', error);
+                    } else {
+                        console.log('[finishSharedQuiz] Supabase update SUCCESS');
                     }
                 } catch (err) {
-                    console.error('Error saving results:', err);
+                    console.error('[finishSharedQuiz] Error saving results:', err);
                     // Continue anyway - show results with local data
                 }
+            } else {
+                console.log('[finishSharedQuiz] Skipping Supabase save (no session or user)');
             }
 
+            console.log('[finishSharedQuiz] Calling recordProjectedScore...');
             recordProjectedScore();
+
+            console.log('[finishSharedQuiz] Calling showSharedResults...');
             showSharedResults();
+            console.log('[finishSharedQuiz] END');
         }
 
         async function showSharedResults() {
-            // Try to refresh participants, but don't block on failure
+            console.log('[showSharedResults] START');
+
+            // Try to refresh participants, but don't block on failure (with timeout)
             try {
-                await refreshParticipants();
+                console.log('[showSharedResults] Refreshing participants...');
+                const refreshPromise = refreshParticipants();
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('refreshParticipants timeout (5s)')), 5000)
+                );
+                await Promise.race([refreshPromise, timeoutPromise]);
+                console.log('[showSharedResults] Participants refreshed');
             } catch (err) {
-                console.error('Error refreshing participants:', err);
+                console.error('[showSharedResults] Error refreshing participants:', err);
                 // Continue with existing sessionParticipants data
             }
 
@@ -1496,6 +1540,7 @@
 
             // Use sessionParticipants if available, otherwise empty array
             const participants = sessionParticipants || [];
+            console.log('[showSharedResults] Participants:', participants.length, participants);
 
             const sortedParticipants = [...participants].sort((a, b) => {
                 const aComplete = isParticipantComplete(a);
@@ -1565,6 +1610,8 @@
                 </div>
             `);
 
+            console.log('[showSharedResults] Render complete, attaching event listener...');
+
             document.getElementById('home-btn').addEventListener('click', async () => {
                 if (sessionChannel) {
                     supabase.removeChannel(sessionChannel);
@@ -1574,6 +1621,8 @@
                 sessionParticipants = [];
                 showStart();
             });
+
+            console.log('[showSharedResults] END');
         }
 
         async function updateSharedLeaderboard() {
