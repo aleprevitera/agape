@@ -1485,7 +1485,9 @@
                             completed_at: new Date().toISOString()
                         })
                         .eq('session_id', sharedSession.id)
-                        .eq('user_id', currentUser.id);
+                        .eq('user_id', currentUser.id)
+                        .select()
+                        .maybeSingle();
 
                     const timeoutPromise = new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Supabase update timeout (10s)')), 10000)
