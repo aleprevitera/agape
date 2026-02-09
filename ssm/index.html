@@ -1253,6 +1253,10 @@
                             <span>${weakAreas.length} aree sotto il 60%</span>
                         </div>
                         ` : ''}
+                        <div class="mode-option" data-mode="multiplayer">
+                            <strong>Sfida con amici</strong>
+                            <span>Crea o unisciti a una sessione condivisa</span>
+                        </div>
                     </div>
                     <button class="btn btn-primary" id="start-btn">Inizia</button>
                     ${hasStats ? `<button class="btn btn-secondary" id="stats-btn" style="margin-left:12px;">Statistiche</button>` : ''}
@@ -1275,6 +1279,8 @@
                     showCustomSetup();
                 } else if (selectedMode === 'weak') {
                     startWeakAreasQuiz();
+                } else if (selectedMode === 'multiplayer') {
+                    showMultiplayerSetup();
                 } else {
                     startQuiz(selectedMode);
                 }
@@ -1771,9 +1777,316 @@
             return shuffle(selected);
         }
 
-        function startQuiz(mode, customNum = 0, customMaterie = []) {
+        // --- Multiplayer functions ---
+        const SESSION_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+        function generateSessionCode() {
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += SESSION_CHARS[Math.floor(Math.random() * SESSION_CHARS.length)];
+            }
+            return code;
+        }
+
+        function showMultiplayerSetup() {
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Sfida con amici</h1>
+                    <p class="subtitle">Crea una sessione o unisciti con un codice</p>
+                    <div class="mode-select">
+                        <div class="mode-option" id="mp-create">
+                            <strong>Crea sessione</strong>
+                            <span>Genera un codice da condividere</span>
+                        </div>
+                        <div class="mode-option" id="mp-join">
+                            <strong>Unisciti con codice</strong>
+                            <span>Inserisci il codice di una sessione</span>
+                        </div>
+                    </div>
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="back-btn">Indietro</button>
+                    </div>
+                </div>
+            `);
+            document.getElementById('back-btn').addEventListener('click', showStart);
+            document.getElementById('mp-create').addEventListener('click', showCreateSession);
+            document.getElementById('mp-join').addEventListener('click', showJoinSession);
+        }
+
+        function showCreateSession() {
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Crea sessione</h1>
+                    <p class="subtitle">Scegli la modalità per la sessione condivisa</p>
+                    <div class="mode-select">
+                        <div class="mode-option selected" data-mode="20">
+                            <strong>20 domande casuali</strong>
+                            <span>Esercitazione rapida</span>
+                        </div>
+                        <div class="mode-option" data-mode="140">
+                            <strong>Simulazione SSM</strong>
+                            <span>140 domande, 210 min</span>
+                        </div>
+                        <div class="mode-option" data-mode="custom">
+                            <strong>Personalizzato</strong>
+                            <span>Scegli materie e numero</span>
+                        </div>
+                    </div>
+                    <div id="custom-options" class="hidden">
+                        <div class="materie-filter">
+                            <div class="filter-actions">
+                                <button class="btn btn-secondary" id="mp-select-all">Tutte</button>
+                                <button class="btn btn-secondary" id="mp-select-none">Nessuna</button>
+                            </div>
+                            <div class="materie-grid" style="margin-top:12px;">
+                                ${materie.map(m => `<span class="materia-chip" data-materia="${encodeURIComponent(m)}">${m}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div style="margin-top:24px;">
+                            <label style="font-size:0.875rem;">Numero domande: <strong id="mp-num-display">50</strong></label>
+                            <input type="range" id="mp-num-slider" min="10" max="140" value="50" style="width:100%;margin-top:8px;">
+                        </div>
+                    </div>
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="back-btn">Indietro</button>
+                        <button class="btn btn-primary" id="create-btn">Crea sessione</button>
+                    </div>
+                </div>
+            `);
+
+            let mpMode = '20';
+            let mpMaterie = [];
+
+            document.querySelectorAll('.mode-option').forEach(el => {
+                el.addEventListener('click', function() {
+                    document.querySelectorAll('.mode-option').forEach(e => e.classList.remove('selected'));
+                    this.classList.add('selected');
+                    mpMode = this.dataset.mode;
+                    document.getElementById('custom-options').classList.toggle('hidden', mpMode !== 'custom');
+                });
+            });
+
+            const slider = document.getElementById('mp-num-slider');
+            if (slider) {
+                const numDisplay = document.getElementById('mp-num-display');
+                slider.addEventListener('input', () => numDisplay.textContent = slider.value);
+            }
+
+            document.querySelectorAll('.materia-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    const m = decodeURIComponent(this.dataset.materia);
+                    if (this.classList.contains('selected')) {
+                        mpMaterie.push(m);
+                    } else {
+                        mpMaterie = mpMaterie.filter(x => x !== m);
+                    }
+                });
+            });
+
+            const selectAll = document.getElementById('mp-select-all');
+            if (selectAll) {
+                selectAll.addEventListener('click', () => {
+                    mpMaterie = [...materie];
+                    document.querySelectorAll('.materia-chip').forEach(c => c.classList.add('selected'));
+                });
+            }
+            const selectNone = document.getElementById('mp-select-none');
+            if (selectNone) {
+                selectNone.addEventListener('click', () => {
+                    mpMaterie = [];
+                    document.querySelectorAll('.materia-chip').forEach(c => c.classList.remove('selected'));
+                });
+            }
+
+            document.getElementById('back-btn').addEventListener('click', showMultiplayerSetup);
+            document.getElementById('create-btn').addEventListener('click', () => {
+                const customNum = slider ? parseInt(slider.value) : 0;
+                createMultiplayerSession(mpMode, customNum, mpMaterie);
+            });
+        }
+
+        async function createMultiplayerSession(mode, customNum, customMaterie) {
+            // Build pool exactly like startQuiz does
             let pool;
             if (mode === '140') {
+                pool = selectSSMQuestions();
+            } else if (mode === '20') {
+                pool = shuffle(questions.map((q, i) => i)).slice(0, 20);
+            } else if (mode === 'custom') {
+                let filtered = questions.map((q, i) => i);
+                if (customMaterie.length > 0) {
+                    filtered = filtered.filter(i => customMaterie.includes(questions[i].materia));
+                }
+                pool = shuffle(filtered).slice(0, Math.min(customNum, filtered.length));
+            }
+
+            if (!pool || pool.length === 0) {
+                alert('Nessuna domanda disponibile per i criteri selezionati');
+                return;
+            }
+
+            // Generate unique code
+            let code;
+            let attempts = 0;
+            while (attempts < 10) {
+                code = generateSessionCode();
+                const { data } = await supabase
+                    .from('quiz_sessions')
+                    .select('code')
+                    .eq('code', code)
+                    .single();
+                if (!data) break;
+                attempts++;
+            }
+
+            // Save to Supabase
+            try {
+                const controller = new AbortController();
+                const abortTimer = setTimeout(() => controller.abort(), 8000);
+
+                const resp = await fetch(SUPABASE_URL + '/rest/v1/quiz_sessions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': 'Bearer ' + accessToken
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        question_indices: pool,
+                        mode: mode,
+                        created_by: currentUser.id
+                    }),
+                    signal: controller.signal
+                });
+                clearTimeout(abortTimer);
+
+                if (!resp.ok) {
+                    const body = await resp.text();
+                    throw new Error(`HTTP ${resp.status}: ${body}`);
+                }
+            } catch (err) {
+                console.error('createMultiplayerSession failed:', err);
+                alert('Errore nella creazione della sessione. Riprova.');
+                return;
+            }
+
+            // Show code to user
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Sessione creata!</h1>
+                    <p class="subtitle">Condividi questo codice con i tuoi amici</p>
+                    <div style="margin:32px auto;padding:28px;background:var(--card);border:1px solid var(--card-border);border-radius:14px;max-width:320px;">
+                        <div style="font-size:2.5rem;font-weight:700;letter-spacing:0.3em;text-align:center;color:var(--teal-glow);font-family:var(--font-body);">${code}</div>
+                        <p style="text-align:center;margin-top:12px;font-size:0.8rem;color:var(--text-dim);">${pool.length} domande · ${mode === '140' ? 'Simulazione SSM' : mode === '20' ? '20 casuali' : 'Personalizzato'}</p>
+                    </div>
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-primary" id="start-mp-btn">Inizia quiz</button>
+                        <button class="btn btn-secondary" id="back-btn">Torna al menu</button>
+                    </div>
+                </div>
+            `);
+
+            document.getElementById('start-mp-btn').addEventListener('click', () => {
+                startQuiz(mode, 0, [], pool);
+            });
+            document.getElementById('back-btn').addEventListener('click', showStart);
+        }
+
+        function showJoinSession() {
+            render(`
+                ${getAuthHeaderHtml()}
+                <div class="start-screen">
+                    <h1>Unisciti a una sessione</h1>
+                    <p class="subtitle">Inserisci il codice della sessione</p>
+                    <div style="margin:32px auto;max-width:320px;">
+                        <input type="text" id="session-code-input" maxlength="6" placeholder="Es. A3K9F2"
+                            style="width:100%;padding:16px;font-size:1.5rem;text-align:center;letter-spacing:0.3em;
+                            text-transform:uppercase;background:var(--card);border:1px solid var(--card-border);
+                            border-radius:12px;color:var(--text);font-family:var(--font-body);outline:none;"
+                        >
+                        <p id="join-error" style="color:var(--red);font-size:0.85rem;margin-top:12px;display:none;"></p>
+                    </div>
+                    <div class="actions" style="justify-content:center;margin-top:24px;">
+                        <button class="btn btn-secondary" id="back-btn">Indietro</button>
+                        <button class="btn btn-primary" id="join-btn">Unisciti</button>
+                    </div>
+                </div>
+            `);
+
+            const input = document.getElementById('session-code-input');
+            input.focus();
+            input.addEventListener('input', () => {
+                input.value = input.value.toUpperCase().replace(/[^ABCDEFGHJKLMNPQRSTUVWXYZ23456789]/g, '');
+            });
+
+            document.getElementById('back-btn').addEventListener('click', showMultiplayerSetup);
+            document.getElementById('join-btn').addEventListener('click', () => {
+                const code = input.value.trim();
+                if (code.length !== 6) {
+                    const errEl = document.getElementById('join-error');
+                    errEl.textContent = 'Il codice deve essere di 6 caratteri.';
+                    errEl.style.display = 'block';
+                    return;
+                }
+                joinMultiplayerSession(code);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('join-btn').click();
+            });
+        }
+
+        async function joinMultiplayerSession(code) {
+            const errEl = document.getElementById('join-error');
+
+            try {
+                const { data, error } = await supabase
+                    .from('quiz_sessions')
+                    .select('*')
+                    .eq('code', code)
+                    .single();
+
+                if (error || !data) {
+                    if (errEl) {
+                        errEl.textContent = 'Codice non trovato. Verifica e riprova.';
+                        errEl.style.display = 'block';
+                    }
+                    return;
+                }
+
+                const pool = data.question_indices;
+                const mode = data.mode;
+
+                // Validate indices
+                const validPool = pool.filter(i => i >= 0 && i < questions.length);
+                if (validPool.length === 0) {
+                    if (errEl) {
+                        errEl.textContent = 'Sessione non valida: nessuna domanda trovata.';
+                        errEl.style.display = 'block';
+                    }
+                    return;
+                }
+
+                startQuiz(mode, 0, [], validPool);
+            } catch (err) {
+                console.error('joinMultiplayerSession failed:', err);
+                if (errEl) {
+                    errEl.textContent = 'Errore di connessione. Riprova.';
+                    errEl.style.display = 'block';
+                }
+            }
+        }
+
+        function startQuiz(mode, customNum = 0, customMaterie = [], prebuiltPool = null) {
+            let pool;
+            if (prebuiltPool) {
+                pool = prebuiltPool;
+            } else if (mode === '140') {
                 pool = selectSSMQuestions();
             } else if (mode === '20') {
                 pool = shuffle(questions.map((q, i) => i)).slice(0, 20);
