@@ -758,7 +758,7 @@
         let currentUser = null;
         let isAuthorized = false;
         let syncStatus = 'offline'; // 'offline', 'syncing', 'synced'
-        let syncTimeout = null;
+        // syncTimeout removed - no more debounced sync
         let timerInterval = null;
         let initialSyncDone = false; // Block outgoing sync until we've loaded from cloud
 
@@ -944,16 +944,12 @@
             updateSyncIndicator();
         }
 
-        function debouncedSync() {
-            if (!currentUser || !initialSyncDone) return;
-
-            // Cancel previous pending sync
-            if (syncTimeout) clearTimeout(syncTimeout);
-
-            syncTimeout = setTimeout(() => {
+        // Periodic background sync every 30s during active use (safety net for mid-quiz close)
+        setInterval(() => {
+            if (currentUser && initialSyncDone) {
                 syncToCloud();
-            }, 1000);
-        }
+            }
+        }, 30000);
 
         function updateSyncIndicator() {
             const indicator = document.getElementById('sync-indicator');
@@ -999,7 +995,6 @@
 
         function saveWrong() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
-            debouncedSync();
         }
 
         function loadStats() {
@@ -1013,7 +1008,6 @@
 
         function saveStats() {
             localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
-            debouncedSync();
         }
 
         function loadSimulations() {
@@ -1026,7 +1020,6 @@
 
         function saveSimulations() {
             localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
-            debouncedSync();
         }
 
         function addSimulation(result) {
@@ -1045,7 +1038,6 @@
 
         function saveProjectionHistory() {
             localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
-            debouncedSync();
         }
 
         // Calculate projected score based on performance per subject
@@ -1548,16 +1540,8 @@
                         localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
 
-                        // Cancel any pending debounced sync
-                        if (syncTimeout) {
-                            clearTimeout(syncTimeout);
-                            syncTimeout = null;
-                        }
-
-                        // Immediate sync to cloud (not debounced)
-                        if (currentUser) {
-                            await syncToCloud();
-                        }
+                        // Sync to cloud
+                        await syncToCloud();
 
                         showStats();
                     }
@@ -2040,8 +2024,7 @@
             // Record projected score for trend tracking
             recordProjectedScore();
 
-            // Cancel debounced sync, direct sync after quiz
-            if (syncTimeout) { clearTimeout(syncTimeout); syncTimeout = null; }
+            // Sync to cloud after quiz completion
             syncToCloud();
 
             showResults();
@@ -2224,9 +2207,8 @@
             document.getElementById('stats-btn').addEventListener('click', showStats);
             document.getElementById('home-btn').addEventListener('click', showStart);
 
-            // Sync diretto dopo completamento quiz (non-SSM)
+            // Sync dopo completamento quiz (non-SSM; SSM synca in finishSSMQuiz)
             if (!isSSM) {
-                if (syncTimeout) { clearTimeout(syncTimeout); syncTimeout = null; }
                 syncToCloud();
             }
         }
