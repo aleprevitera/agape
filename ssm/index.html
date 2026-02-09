@@ -883,63 +883,61 @@
                 }
 
                 if (data) {
-                    // Cloud is source of truth - REPLACE local data (no merge)
+                    console.log('syncFromCloud: got data, columns:', Object.keys(data));
                     statsData = data.stats_data || { materie: {}, argomenti: {} };
                     wrongIds = data.wrong_ids || [];
                     simulations = data.simulations || [];
                     projectionHistory = data.projection_history || [];
 
-                    // Save to localStorage as cache
                     localStorage.setItem(STATS_KEY, JSON.stringify(statsData));
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(wrongIds));
                     localStorage.setItem(SIMULATIONS_KEY, JSON.stringify(simulations));
                     localStorage.setItem(PROJECTION_HISTORY_KEY, JSON.stringify(projectionHistory));
+                } else {
+                    console.log('syncFromCloud: no data yet (new user)');
                 }
 
                 syncStatus = 'synced';
             } catch (err) {
-                console.error('Sync from cloud error:', err);
+                console.error('syncFromCloud: FAILED', err.message || err);
                 syncStatus = 'offline';
-                // If cloud fails, keep using local data as fallback
             }
 
-            initialSyncDone = true; // Now allow outgoing syncs
+            initialSyncDone = true;
             updateSyncIndicator();
+            console.log('syncFromCloud: done, initialSyncDone =', initialSyncDone, 'status =', syncStatus);
         }
 
         async function syncToCloud() {
-            if (!currentUser) return;
+            if (!currentUser || !initialSyncDone) {
+                console.log('syncToCloud: skip -', !currentUser ? 'no user' : 'initial sync not done');
+                return;
+            }
+
+            syncStatus = 'syncing';
+            updateSyncIndicator();
 
             try {
-                // Try full sync first
+                const payload = {
+                    user_id: currentUser.id,
+                    stats_data: statsData,
+                    wrong_ids: wrongIds,
+                    simulations: simulations,
+                    projection_history: projectionHistory,
+                    updated_at: new Date().toISOString()
+                };
+                console.log('syncToCloud: sending...', { stats: Object.keys(statsData.materie).length + ' materie', wrong: wrongIds.length, sims: simulations.length });
+
                 const { error } = await supabase
                     .from('user_progress')
-                    .upsert({
-                        user_id: currentUser.id,
-                        stats_data: statsData,
-                        wrong_ids: wrongIds,
-                        simulations: simulations,
-                        projection_history: projectionHistory,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id' });
+                    .upsert(payload, { onConflict: 'user_id' });
 
-                if (error) {
-                    // If error (possibly missing columns), try basic sync
-                    console.warn('Full sync failed, trying basic sync:', error.message);
-                    const { error: basicError } = await supabase
-                        .from('user_progress')
-                        .upsert({
-                            user_id: currentUser.id,
-                            stats_data: statsData,
-                            wrong_ids: wrongIds,
-                            updated_at: new Date().toISOString()
-                        }, { onConflict: 'user_id' });
+                if (error) throw error;
 
-                    if (basicError) throw basicError;
-                }
                 syncStatus = 'synced';
+                console.log('syncToCloud: OK');
             } catch (err) {
-                console.error('Sync to cloud error:', err);
+                console.error('syncToCloud: FAILED', err.message || err);
                 syncStatus = 'offline';
             }
 
@@ -947,77 +945,14 @@
         }
 
         function debouncedSync() {
-            if (!currentUser) return;
-            if (!initialSyncDone) return; // Don't sync TO cloud until we've loaded FROM cloud
+            if (!currentUser || !initialSyncDone) return;
 
+            // Cancel previous pending sync
             if (syncTimeout) clearTimeout(syncTimeout);
-            syncStatus = 'syncing';
-            updateSyncIndicator();
 
             syncTimeout = setTimeout(() => {
                 syncToCloud();
-            }, 2000); // Wait 2 seconds before syncing
-        }
-
-        function mergeStats(local, cloud) {
-            const merged = { materie: {}, argomenti: {} };
-
-            // Merge materie
-            const allMaterie = new Set([...Object.keys(local.materie || {}), ...Object.keys(cloud.materie || {})]);
-            allMaterie.forEach(m => {
-                const localM = (local.materie || {})[m] || { correct: 0, total: 0 };
-                const cloudM = (cloud.materie || {})[m] || { correct: 0, total: 0 };
-                merged.materie[m] = {
-                    correct: Math.max(localM.correct, cloudM.correct),
-                    total: Math.max(localM.total, cloudM.total)
-                };
-            });
-
-            // Merge argomenti
-            const allArg = new Set([...Object.keys(local.argomenti || {}), ...Object.keys(cloud.argomenti || {})]);
-            allArg.forEach(a => {
-                const localA = (local.argomenti || {})[a] || { correct: 0, total: 0, materia: '', argomento: '' };
-                const cloudA = (cloud.argomenti || {})[a] || { correct: 0, total: 0, materia: '', argomento: '' };
-                merged.argomenti[a] = {
-                    correct: Math.max(localA.correct, cloudA.correct),
-                    total: Math.max(localA.total, cloudA.total),
-                    materia: localA.materia || cloudA.materia,
-                    argomento: localA.argomento || cloudA.argomento
-                };
-            });
-
-            return merged;
-        }
-
-        function mergeWrongIds(local, cloud) {
-            return [...new Set([...local, ...cloud])];
-        }
-
-        function mergeSimulations(local, cloud) {
-            // Merge by id, keeping unique simulations, sorted by date descending
-            const byId = new Map();
-            [...local, ...cloud].forEach(sim => {
-                if (!byId.has(sim.id)) {
-                    byId.set(sim.id, sim);
-                }
-            });
-            return Array.from(byId.values())
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 50); // Keep max 50
-        }
-
-        function mergeProjectionHistory(local, cloud) {
-            // Merge by date, keeping unique entries, sorted chronologically
-            const byDate = new Map();
-            [...local, ...cloud].forEach(p => {
-                const key = p.date;
-                if (!byDate.has(key)) {
-                    byDate.set(key, p);
-                }
-            });
-            return Array.from(byDate.values())
-                .sort((a, b) => new Date(a.date) - new Date(b.date))
-                .slice(-100); // Keep last 100
+            }, 1000);
         }
 
         function updateSyncIndicator() {
@@ -2105,6 +2040,10 @@
             // Record projected score for trend tracking
             recordProjectedScore();
 
+            // Cancel debounced sync, direct sync after quiz
+            if (syncTimeout) { clearTimeout(syncTimeout); syncTimeout = null; }
+            syncToCloud();
+
             showResults();
         }
 
@@ -2284,6 +2223,12 @@
             document.getElementById('restart-btn').addEventListener('click', () => startQuiz('20'));
             document.getElementById('stats-btn').addEventListener('click', showStats);
             document.getElementById('home-btn').addEventListener('click', showStart);
+
+            // Sync diretto dopo completamento quiz (non-SSM)
+            if (!isSSM) {
+                if (syncTimeout) { clearTimeout(syncTimeout); syncTimeout = null; }
+                syncToCloud();
+            }
         }
 
         // Load JSONL
