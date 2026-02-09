@@ -908,14 +908,27 @@
             console.log('syncFromCloud: done, initialSyncDone =', initialSyncDone, 'status =', syncStatus);
         }
 
+        let _syncId = 0;
+        let _syncRunning = false;
+
         async function syncToCloud() {
             if (!currentUser || !initialSyncDone) {
-                console.log('syncToCloud: skip -', !currentUser ? 'no user' : 'initial sync not done');
+                console.log('[sync] skip:', !currentUser ? 'no user' : 'initial sync not done');
+                return;
+            }
+            if (_syncRunning) {
+                console.log('[sync] SKIP: another sync already running');
                 return;
             }
 
+            _syncRunning = true;
+            const id = ++_syncId;
+            const t0 = Date.now();
+
             syncStatus = 'syncing';
             updateSyncIndicator();
+
+            console.log(`[sync #${id}] START`, { materie: Object.keys(statsData.materie).length, wrong: wrongIds.length, sims: simulations.length, proj: projectionHistory.length });
 
             try {
                 const payload = {
@@ -926,25 +939,29 @@
                     projection_history: projectionHistory,
                     updated_at: new Date().toISOString()
                 };
-                console.log('syncToCloud: sending...', { stats: Object.keys(statsData.materie).length + ' materie', wrong: wrongIds.length, sims: simulations.length });
 
-                const { error } = await supabase
+                console.log(`[sync #${id}] calling supabase.upsert...`);
+
+                const result = await supabase
                     .from('user_progress')
                     .upsert(payload, { onConflict: 'user_id' });
 
-                if (error) throw error;
+                console.log(`[sync #${id}] upsert returned in ${Date.now() - t0}ms`, result);
+
+                if (result.error) throw result.error;
 
                 syncStatus = 'synced';
-                console.log('syncToCloud: OK');
+                console.log(`[sync #${id}] OK (${Date.now() - t0}ms)`);
             } catch (err) {
-                console.error('syncToCloud: FAILED', err.message || err);
+                console.error(`[sync #${id}] FAILED (${Date.now() - t0}ms)`, err);
                 syncStatus = 'offline';
             }
 
+            _syncRunning = false;
             updateSyncIndicator();
         }
 
-        // Periodic background sync every 30s during active use (safety net for mid-quiz close)
+        // Periodic background sync (safety net for mid-quiz close)
         setInterval(() => {
             if (currentUser && initialSyncDone) {
                 syncToCloud();
