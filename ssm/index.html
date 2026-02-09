@@ -757,6 +757,7 @@
 
         let currentUser = null;
         let isAuthorized = false;
+        let accessToken = null;
         let syncStatus = 'offline'; // 'offline', 'syncing', 'synced'
         // syncTimeout removed - no more debounced sync
         let timerInterval = null;
@@ -786,6 +787,8 @@
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 currentUser = session.user;
+                accessToken = session.access_token;
+                console.log('[auth] session found, token cached');
                 isAuthorized = await checkAuthorization(currentUser.email);
                 if (isAuthorized) {
                     await syncFromCloud();
@@ -795,6 +798,8 @@
             supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     currentUser = session.user;
+                    accessToken = session.access_token;
+                    console.log('[auth] signed in, token cached');
                     isAuthorized = await checkAuthorization(currentUser.email);
                     if (isAuthorized) {
                         await syncFromCloud();
@@ -802,8 +807,12 @@
                     } else {
                         showUnauthorized();
                     }
+                } else if (event === 'TOKEN_REFRESHED' && session) {
+                    accessToken = session.access_token;
+                    console.log('[auth] token refreshed');
                 } else if (event === 'SIGNED_OUT') {
                     currentUser = null;
+                    accessToken = null;
                     isAuthorized = false;
                     syncStatus = 'offline';
                     showLoginRequired();
@@ -827,6 +836,7 @@
         async function logout() {
             await supabase.auth.signOut();
             currentUser = null;
+            accessToken = null;
             isAuthorized = false;
             syncStatus = 'offline';
             initialSyncDone = false;
@@ -911,7 +921,7 @@
         let _syncId = 0;
 
         async function syncToCloud() {
-            if (!currentUser || !initialSyncDone) return;
+            if (!currentUser || !initialSyncDone || !accessToken) return;
 
             const id = ++_syncId;
             const t0 = Date.now();
@@ -930,12 +940,8 @@
             console.log(`[sync #${id}] fetch start`, { materie: Object.keys(statsData.materie).length, wrong: wrongIds.length, sims: simulations.length });
 
             try {
-                const session = await supabase.auth.getSession();
-                const accessToken = session?.data?.session?.access_token;
-                if (!accessToken) throw new Error('No access token');
-
                 const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 8000);
+                const abortTimer = setTimeout(() => controller.abort(), 8000);
 
                 const resp = await fetch(SUPABASE_URL + '/rest/v1/user_progress', {
                     method: 'POST',
@@ -948,7 +954,7 @@
                     body: JSON.stringify(payload),
                     signal: controller.signal
                 });
-                clearTimeout(timeout);
+                clearTimeout(abortTimer);
 
                 if (!resp.ok) {
                     const body = await resp.text();
